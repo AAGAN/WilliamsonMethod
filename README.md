@@ -1,2 +1,2 @@
 # WilliamsonMethod
-c++ implementation of the Williamson's method
+c++ implementation of Williamson's method
