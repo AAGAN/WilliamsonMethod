@@ -2,6 +2,4 @@
 c++ implementation of Williamson's method
 
 
-Just for a test.
-
-
+Test a change.
