@@ -2,16 +2,11 @@
 #include "agent.hpp"
 #include <iostream>
 
-using namespace std;
 
 
-
-
-int williamson()
+int williamson(agent *extiguishig_agent, std::vector<tank_state> &Tankstate, double P, double T, double D)
 {
   
-  
-  
-  cout << "Hello World!" << endl;
+  std::cout << "Hello World!" << std::endl;
   return 0;
 }
