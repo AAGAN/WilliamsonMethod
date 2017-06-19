@@ -1,4 +1,4 @@
-#include "williamson.h"
+#include "williamson.hpp"
 #include <iostream>
 
 using namespace std;
@@ -6,6 +6,6 @@ using namespace std;
 
 int williamson()
 {
-  cout << "Hello World!" <<std::endl;
+  cout << "Hello World!" << endl;
   return 0;
 }
