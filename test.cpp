@@ -26,7 +26,7 @@ int main()
   2 = Novec 1230
   */
    
-  agent extiguishig_agent(1);
+  agent extiguishig_agent(1); // initialize this instance with 1
   agent * Halon1301 = & extiguishig_agent;
   double P = 1000; //psi
   double T = 300; //kelvin
