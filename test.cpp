@@ -10,14 +10,16 @@
 
 int main()
 {
+  // read in property data from files or best fit function: 'agent property file'
   /*
+  initialize the instance with agent type
   1 = Halon 1301
   2 = Novec 1230
   */
-   
-  // read in property data from files or best fit function: 'agent property file'
-  agent extiguishig_agent(1); // initialize this instance with 1
-  agent * Halon1301 = & extiguishig_agent;
+  // agent extinguishing_agent(1);
+  // agent * Halon1301 = & extinguishing_agent;
+  agent extinguishing_agent(2);
+  agent * Novec1230 = & extinguishing_agent;
   
   // Initial storage conditions
   double P = 1000; // Partial pressure of nitrogen (psi)
@@ -28,7 +30,8 @@ int main()
   
   williamson
   (
-     Halon1301,
+    // Halon1301,
+     Novec1230,
      Tank_state,
      P, 
      T, 

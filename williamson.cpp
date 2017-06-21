@@ -4,13 +4,13 @@
 
 
 
-int williamson(agent *extiguishig_agent, std::vector<tank_state> &Tankstate, double P, double T, double D)
+int williamson(agent *extinguishing_agent, std::vector<tank_state> &Tankstate, double P, double T, double D)
 {
   // Accessing agent properties
-  std::vector<double> vapor_p = extiguishig_agent->get_vapor_p();
-  std::vector<double> liquid_spec_vol = extiguishig_agent->get_liquid_spec_vol();
-  std::vector<double> vapor_spec_vol = extiguishig_agent->get_vapor_spec_vol();
-  std::vector<double> c_henry = extiguishig_agent->get_c_henry();
+  std::vector<double> vapor_p = extinguishing_agent->get_vapor_p();
+  std::vector<double> liquid_spec_vol = extinguishing_agent->get_liquid_spec_vol();
+  std::vector<double> vapor_spec_vol = extinguishing_agent->get_vapor_spec_vol();
+  std::vector<double> c_henry = extinguishing_agent->get_c_henry();
   
   // Initialize the tank state
   // Assume the property data file starts with the storage temperature and drops one degree K each line!!
