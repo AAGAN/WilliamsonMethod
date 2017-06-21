@@ -6,21 +6,22 @@
 
 int main()
 {
-  
+
   /*
   1 = Halon 1301
   2 = Novec 1230
   */
    
-  agent extiguishig_agent(1);
-  agent * Halon1301 = & extiguishig_agent;
-  double P = 1500 * 6890; //Pa
-  double T = 300; //kelvin
-  double D = 0.0008; //kg/(m^3)
-  std::vector<tank_state> Tank_state;
   // read in property data from files or best fit function: 'agent property file'
+  agent extiguishig_agent(1); // initialize this instance with 1
+  agent * Halon1301 = & extiguishig_agent;
+
+  double P = 1500 * 6890; //Pa Partial pressure of nitrogen
+  double T = 300; //kelvin Storage temperature
+  double D = 0.0008; //kg/(m^3) Filling density of storage container
+
+  std::vector<tank_state> Tank_state;
   
-  // pressure vector = williamson(Halon,'temperature vector', P, D, T);
   
   int error_code = williamson
   (
@@ -30,6 +31,10 @@ int main()
      T, 
      D
   );
+  // Tank_state has been updated after running williamson
+  
+  std::cout << Tank_state[0].pressure << ' ' << Tank_state[0].liquid << ' ' << Tank_state[0].vapor << ' ' << Tank_state[0].liquid_density << std::endl;
+
   
   if (error_code == 0)
   {
