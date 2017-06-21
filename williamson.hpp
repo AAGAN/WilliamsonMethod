@@ -18,7 +18,7 @@ struct tank_state
 int williamson
 (
     agent*, //pointer to the agent class
-    std::vector<tank_state>&, //a struct showing the state of the tank during discharge
+    std::vector<tank_state>&, //a struct showing the state of the tank during discharge. This is a reference to the Tank_state vector in main function.
     double, // initial partial pressure of nitrogen
     double, // initial storage temperature
     double  // fill density 
