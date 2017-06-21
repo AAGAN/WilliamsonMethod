@@ -34,17 +34,16 @@ agent::~agent()
 // Remember to use the namespace std:: !!
 agent::agent(int i)
 {
+    std::string property_file_name;
     
     if (i==1) // read in property data for Halon 1301
     {
-        
-        
-
+        property_file_name = "Halon1301_property.csv"
     }
     
     else if (i==2) // read in property data for Novec 1230
     {
-        
+        property_file_name = "Novec1230_property.csv"
     }
     
     else // Neither Halon nor Novec. Bad input.
@@ -53,7 +52,7 @@ agent::agent(int i)
     }
         
         
-    std::ifstream infile( "Halon1301_property.csv" ); // input data stream from file
+    std::ifstream infile(property_file_name); // input data stream from file
     
     while (infile)
     {
@@ -80,8 +79,8 @@ agent::agent(int i)
         liquid_entro_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         vapor_entro_.push_back(atof(one_number.c_str()));
-        getline(num_list, one_number, ',');
-        c_henry_.push_back(atof(one_number.c_str()));
+        // getline(num_list, one_number, ',');
+        // c_henry_.push_back(atof(one_number.c_str()));
         
         // Expect 9 numbers from each line
         if (!num_list.eof())

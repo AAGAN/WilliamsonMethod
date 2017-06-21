@@ -3,7 +3,6 @@
 #include <iostream>
 
 
-
 int williamson(agent *extinguishing_agent, std::vector<tank_state> &Tankstate, double P, double T, double D)
 {
   // Accessing agent properties
@@ -24,9 +23,6 @@ int williamson(agent *extinguishing_agent, std::vector<tank_state> &Tankstate, d
   current_state.liquid_density = (1+0.01*P/c_henry[0])/(liquid_spec_vol[0]*(1+0.053*P/c_henry[0]));
   current_state.percent_discharge = 0.0;
   Tankstate.push_back(current_state); // Record the initial tank state
-  
-  
-  
-  // std::cout << "Hello World!" << std::endl;
+
   return 0;
 }
