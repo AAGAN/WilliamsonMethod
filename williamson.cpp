@@ -3,7 +3,6 @@
 #include <iostream>
 
 
-
 int williamson(agent *extiguishig_agent, std::vector<tank_state> &Tankstate, double P, double T, double D)
 {
   // Accessing agent properties
@@ -11,7 +10,7 @@ int williamson(agent *extiguishig_agent, std::vector<tank_state> &Tankstate, dou
   std::vector<double> liquid_spec_vol = extiguishig_agent->get_liquid_spec_vol();
   std::vector<double> vapor_spec_vol = extiguishig_agent->get_vapor_spec_vol();
   std::vector<double> c_henry = extiguishig_agent->get_c_henry();
-  
+
   // Initialize the tank state
   // Assume the property data file starts with the storage temperature and drops one degree K each line!!
   tank_state current_state; // define a current tank state
@@ -24,9 +23,6 @@ int williamson(agent *extiguishig_agent, std::vector<tank_state> &Tankstate, dou
   current_state.liquid_density = (1+0.01*P/c_henry[0])/(liquid_spec_vol[0]*(1+0.053*P/c_henry[0]));
   current_state.percent_discharge = 0.0;
   Tankstate.push_back(current_state); // Record the initial tank state
-  
-  
-  
-  // std::cout << "Hello World!" << std::endl;
+
   return 0;
 }
