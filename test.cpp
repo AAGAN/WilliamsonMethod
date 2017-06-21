@@ -6,17 +6,15 @@
 
 int main()
 {
-  // read in property data from files or best fit function: 'agent property file'
   
+  // read in property data from files or best fit function: 'agent property file'
   /*
   initialize the instance with agent type
   1 = Halon 1301
   2 = Novec 1230
   */
-  // agent extinguishing_agent(1);
-  // agent * Halon1301 = & extinguishing_agent;
   agent extinguishing_agent(2);
-  agent * Novec1230 = & extinguishing_agent;
+  agent * p_agent = & extinguishing_agent;
   
   // Initial storage conditions
   double P = 1500 * 6890; //Pa Partial pressure of nitrogen
@@ -35,8 +33,6 @@ int main()
     D
   );
   // Tank_state has been updated after running williamson
-  
-  std::cout << Tank_state[0].pressure << ' ' << Tank_state[0].liquid << ' ' << Tank_state[0].vapor << ' ' << Tank_state[0].liquid_density << std::endl;
 
   
   if (error_code == 0)
