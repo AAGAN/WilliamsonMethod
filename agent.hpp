@@ -1,8 +1,12 @@
 #pragma once
 #include <vector>
 
-/**
+// brief description
+//! Declaration of the agent class
 
+// detailed description
+/**
+constructor, destructor, accessor, private parameter
 */
 class agent
 {
@@ -11,7 +15,7 @@ class agent
         ~agent();
         agent(int i); //!< 1 = Halon 1301 , 2 = Novec 1230
         
-        // accessor functions
+        //! accessor functions
         std::vector<double> get_temperature() const {return temperature_;}
         std::vector<double> get_vapor_p() const {return vapor_p_;}
         std::vector<double> get_liquid_spec_vol() const {return liquid_spec_vol_;}
@@ -23,8 +27,16 @@ class agent
         std::vector<double> get_c_henry() const {return c_henry_;}
     
     private:
-        // agent property parameters
-        std::vector<double> temperature_, vapor_p_, liquid_spec_vol_, vapor_spec_vol_, liquid_enthal_, vapor_enthal_, liquid_entro_, vapor_entro_, c_henry_;
+        //! agent property parameters
+        std::vector<double> temperature_, //!< temperature
+                            vapor_p_, //!< agent vapor pressure
+                            liquid_spec_vol_, //!< liquid specific volume
+                            vapor_spec_vol_, //!< vapor specific volume
+                            liquid_enthal_, //!< liquid enthalpy
+                            vapor_enthal_, //!< vapor enthalpy
+                            liquid_entro_, //!< liquid entropy
+                            vapor_entro_, //!< vapor entropy
+                            c_henry_; //!< henry's law constant
         // double temperature_ [], vapor_p_ [], liquid_spec_vol_ [], vapor_spec_vol_ [], liquid_enthal_ [], vapor_enthal_ [], liquid_entro_ [], vapor_entro_ [], c_henry_ [];
     
 };

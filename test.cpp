@@ -8,18 +8,18 @@ int main()
 {
   
   // read in property data from files or best fit function: 'agent property file'
-  /*
+  /**
   initialize the instance with agent type
   1 = Halon 1301
   2 = Novec 1230
   */
-  agent extinguishing_agent(2);
+  agent extinguishing_agent(2); // agent instance
   agent * p_agent = & extinguishing_agent;
   
   // Initial storage conditions
-  double P = 1500 * 6890; //Pa Partial pressure of nitrogen
-  double T = 300; //kelvin Storage temperature
-  double D = 0.0008; //kg/(m^3) Filling density of storage container
+  double P = 1500 * 6890; // Partial pressure of nitrogen (Pa)
+  double T = 300; // Storage temperature (Kelvin)
+  double D = 0.0008; // Filling density of storage container (kg/(m^3))
 
   std::vector<tank_state> Tank_state;
   
@@ -37,13 +37,13 @@ int main()
   
   if (error_code == 0)
   {
-    std::cout << "temperature" << "," 
-              << "pressure" << "," 
-              << "discharge" << "," 
-              << "liquid" << "," 
-              << "vapor" << "," 
-              << "n_pressure" << "," 
-              << "liquid_density" << "," 
+    std::cout << "temperature" << ", " 
+              << "pressure" << ", " 
+              << "discharge" << ", " 
+              << "liquid" << ", " 
+              << "vapor" << ", " 
+              << "n_pressure" << ", " 
+              << "liquid_density" << ", " 
               << "percent_discharge" << std::endl;
   
     for (int i = 0; i < Tank_state.size(); i++) 
