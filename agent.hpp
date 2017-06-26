@@ -28,15 +28,15 @@ class agent
     
     private:
         //! agent property parameters
-        std::vector<double> temperature_, //!< temperature
-                            vapor_p_, //!< agent vapor pressure
-                            liquid_spec_vol_, //!< liquid specific volume
-                            vapor_spec_vol_, //!< vapor specific volume
-                            liquid_enthal_, //!< liquid enthalpy
-                            vapor_enthal_, //!< vapor enthalpy
-                            liquid_entro_, //!< liquid entropy
-                            vapor_entro_, //!< vapor entropy
-                            c_henry_; //!< henry's law constant
+        std::vector<double> temperature_, //!< temperature (F)
+                            vapor_p_, //!< agent vapor pressure (PSI)
+                            liquid_spec_vol_, //!< liquid specific volume (cubic foot/pound)
+                            vapor_spec_vol_, //!< vapor specific volume (cubic foot/pound)
+                            liquid_enthal_, //!< liquid enthalpy (btu/pound)
+                            vapor_enthal_, //!< vapor enthalpy (btu/pound)
+                            liquid_entro_, //!< liquid entropy (btu/pound/rankine)
+                            vapor_entro_, //!< vapor entropy (btu/pound/rankine)
+                            c_henry_; //!< henry's law constant (psi/weight percent)
         // double temperature_ [], vapor_p_ [], liquid_spec_vol_ [], vapor_spec_vol_ [], liquid_enthal_ [], vapor_enthal_ [], liquid_entro_ [], vapor_entro_ [], c_henry_ [];
     
 };

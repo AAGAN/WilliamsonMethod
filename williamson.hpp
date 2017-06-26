@@ -8,8 +8,8 @@ struct tank_state
   double temperature; //!< container temperature
   double pressure; //!< container pressure
   double discharge; //!< discharged liquid mass
-  double liquid; //!< liquid in container
-  double vapor; //!< vapor in container
+  double liquid; //!< liquid mass in container
+  double vapor; //!< vapor mass in container
   double n_pressure; //!< pressure of N2
   double liquid_density; //!< density of liquid mixture (with N2 solute)
   double percent_discharge; //!< How is this defined?
@@ -19,6 +19,7 @@ struct tank_state
 int williamson
 (
     agent*, //!< pointer to the agent class
+    int, //!< indicator of agent type
     std::vector<tank_state>&, //!< a reference to the Tank_state vector in main function.
     double, //!< initial partial pressure of nitrogen
     double, //!< initial storage temperature
