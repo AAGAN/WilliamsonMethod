@@ -71,16 +71,16 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
     //! Intermediate parameters
     E1 = (1 + 0.053*current_state.n_pressure/c_henry[count_T-1]) * liquid_entro[count_T-1];
     E6 = 1 + 0.01*current_state.n_pressure/c_henry[count_T-1];
+    R1 = (1 + molecular_weight_ratio*current_state.n_pressure/vapor_p[count_T-1]) / E6;
+    A1 = R1*E1 - (1 + current_state.n_pressure/vapor_p[count_T-1]) * vapor_entro[count_T-1];
     
     //! Converging pressure
     double P_thres = 0.02; //!< pressure threshold (psi)
     while ( std::abs(P3 - P2) > P_thres ) // loop if pressure difference is larger than threshold
     {
       E5 = (1 + 0.053*P2/c_henry[count_T]) * liquid_spec_vol[count_T];
-      R1 = (1 + molecular_weight_ratio*current_state.n_pressure/vapor_p[count_T-1]) / E6;
       R2 = (1 + 0.01*P2/c_henry[count_T]) / E6;
       R3 = (1 + molecular_weight_ratio*P2/vapor_p[count_T]) / E6;
-      A1 = R1*E1 - (1 + current_state.n_pressure/vapor_p[count_T-1]) * vapor_entro[count_T-1];
       A2 = R2*E1 - (1 + 0.053*P2/c_henry[count_T]) * liquid_entro[count_T];
       A3 = R3*E1 - (1 + P2/vapor_p[count_T]) * vapor_entro[count_T];
       

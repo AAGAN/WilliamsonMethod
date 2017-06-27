@@ -8,7 +8,7 @@ int main()
 {
   
   // read in property data from files or best fit function: 'agent property file'
-  int agent_type = 2;
+  int agent_type = 1;
   /**
   initialize the instance with agent type
   1 = Halon 1301
@@ -18,7 +18,7 @@ int main()
   agent * p_agent = & extinguishing_agent;
   
   // Initial storage conditions
-  double P = 1500 * 6894.76; // Partial pressure of nitrogen (Pa)
+  double P = 401 * 6894.76; // Partial pressure of nitrogen (Pa)
   double T = 294.261; // Storage temperature (Kelvin)
   double D = 1121.29; // Filling density of storage container (kg/(m^3))
 
