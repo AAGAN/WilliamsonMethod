@@ -96,7 +96,7 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
       else if (P3 > (P2+P_thres))   P2 = P2 + P_thres;
       else ; // do nothing
       
-      // std::cout << count_T << std::endl;
+      // std::cout << P2 << ' ' << P3 << std::endl;
     }
     
     //! Update current container state

@@ -9,7 +9,7 @@ int main()
 {
   
   // read in property data from files or best fit function: 'agent property file'
-  int agent_type = 1;
+  int agent_type = 2;
   /**
   initialize the instance with agent type
   1 = Halon 1301
@@ -19,9 +19,9 @@ int main()
   agent * p_agent = & extinguishing_agent;
   
   // Initial storage conditions
-  double P = 401 * 6894.76;                 // Partial pressure of nitrogen (Pa)
+  double P = 1010.3 * 6894.76;                 // Partial pressure of nitrogen (Pa)
   double T = (70 - 32)/(9/5.0) + 273.15;    // Storage temperature (Kelvin)
-  double D = 80 * 16.0185;                  // Filling density of storage container (kg/(m^3))
+  double D = 1400; // 70 * 16.0185;                  // Filling density of storage container (kg/(m^3))
 
   std::vector<tank_state> Tank_state;
   
@@ -49,8 +49,9 @@ int main()
               << "liquid_density (lbs/cu.ft.)" << ", " 
               << "percent_discharge" << std::endl;
               
-    std::string container_discharge_file;                           
-    container_discharge_file = "Halon1301_container_discharge_density80.csv";  // The file to hold container state during discharge
+    std::string container_discharge_file;                             // The file to hold container state during discharge
+    // container_discharge_file = "Halon1301_container_discharge_density80.csv";
+    container_discharge_file = "Novec1230_container_discharge.csv";
     std::ofstream outfile(container_discharge_file.c_str());
   
     for (int i = 0; i < Tank_state.size(); i++) 

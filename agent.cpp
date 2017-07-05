@@ -129,6 +129,7 @@ agent::agent(int i)
         
             //! Use a linear relation between Henry's constant and temperature
             c_henry_.insert(c_henry_.begin(), 0.9286*temperature_.front() + 3494.6);
+            // c_henry_.insert(c_henry_.begin(), 3600);
         
             //! Expect 8 numbers from each line
             if (!num_list.eof())
