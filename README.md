@@ -22,16 +22,16 @@ The calculated pressure recession should match Figure H.1(b) of NFPA 12A for Hal
 
 Unlike in the paper which uses a linear relation between liquid entropy and temperature, directly use the liquid entropy data.
 
+
+
 # Caveats:
 
 * Storage temperature has to start from the highest temperature in data file! Otherwise need to note and push_back into vectors.
-Should change later and do a temperature search, but the storage temperature should still exist in data file.
-
-* percent_discharge is not well-defined yet.
+Can change later and do a temperature search, but the storage temperature should still exist in data file.
 
 * Calculation assumes unit volume.
 
-* Molecular weight ratio is 0.188 in paper but really depends on the agent.
+* Molecular weight ratio is 0.188 in paper but really needs to be changed depending on the agent.
 
 
 
