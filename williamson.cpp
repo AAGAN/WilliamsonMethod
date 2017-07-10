@@ -68,7 +68,7 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
   //! Loop through all temperatures
   for ( ; count_T < temperature.size(); count_T++)
   {
-    double N, L1, L2, V2, P2, P3, E1, E5, E6, R1, R2, R3, A1, A2, A3;
+    double N, L1, L2, V2, P2, P3, E1, E5, E6, R1, R2, R3, A1, A2, A3; // intermediate variables
     
     N = current_state.liquid*0.01*current_state.n_pressure/c_henry[count_T-1] + current_state.vapor*molecular_weight_ratio*current_state.n_pressure/vapor_p[count_T-1]; // weight of nitrogen in container
     P2 = current_state.n_pressure - 1;    // assumed new nitrogen pressure after discharge

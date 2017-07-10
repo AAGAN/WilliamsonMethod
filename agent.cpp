@@ -30,14 +30,13 @@ agent::~agent()
 }
   
   
-//! class constructor based on agent type
-// Remember to use the namespace std:: !!
+// Class constructor based on agent type. Remember to use the namespace std:: !!
 agent::agent(int i)
 {
     std::string property_file_name;
     
     
-    if (i==1) //!< Halon 1301
+    if (i==1) //! Halon 1301
     {
         property_file_name = "Halon1301_property.csv"; // Use property data file for Halon 1301
         
@@ -68,14 +67,14 @@ agent::agent(int i)
             getline(num_list, one_number, ',');
             c_henry_.insert(c_henry_.begin(), atof(one_number.c_str()));
         
-            //! Expect 9 numbers from each line
+            // Expect 9 numbers from each line
             if (!num_list.eof())
             {
                 std::cout << "Unexpected: didn't reach end of line!" << std::endl;
             }
         }
     
-        //! Expect to reach end of file
+        // Expect to reach end of file
         if (!infile.eof())
         {
             std::cout << "Unexpected: didn't reach end of file!" << std::endl;
@@ -83,7 +82,7 @@ agent::agent(int i)
     }
     
     
-    else if (i==2) //!< Novec 1230
+    else if (i==2) //! Novec 1230
     {
         property_file_name = "Novec1230_property.csv"; // Use property data file for Novec 1230
         
@@ -127,18 +126,18 @@ agent::agent(int i)
             // getline(num_list, one_number, ',');
             // c_henry_.push_back(atof(one_number.c_str()));
         
-            //! Use a linear relation between Henry's constant and temperature
+            // Use a linear relation between Henry's constant and temperature
             c_henry_.insert(c_henry_.begin(), 0.9286*temperature_.front() + 3494.6);
             // c_henry_.insert(c_henry_.begin(), 3600);
         
-            //! Expect 8 numbers from each line
+            // Expect 8 numbers from each line
             if (!num_list.eof())
             {
                 std::cout << "Unexpected: didn't reach end of line!" << std::endl;
             }
         }
     
-        //! Expect to reach end of file
+        // Expect to reach end of file
         if (!infile.eof())
         {
             std::cout << "Unexpected: didn't reach end of file!" << std::endl;
@@ -146,7 +145,7 @@ agent::agent(int i)
     }
     
     
-    else //!< Neither Halon nor Novec. Bad input. Abort the program.
+    else //! Neither Halon nor Novec. Bad input. Abort the program.
     {
         std::cout << "Wrong agent indicator!" << std::endl;
         abort();

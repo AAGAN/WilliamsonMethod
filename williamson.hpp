@@ -2,7 +2,7 @@
 #include "agent.hpp"
 #include <vector>
 
-//! A structure showing the state of the tank during discharge.
+//! A structure with the state of the tank during discharge.
 struct tank_state
 {
   double temperature;         //!< container temperature
@@ -14,6 +14,7 @@ struct tank_state
   double liquid_density;      //!< density of liquid mixture (with N2 solute)
   double percent_discharge;   //!< mass of discharged agent over initial filled agent
 };
+
 
 //! Williamson method as in the paper
 int williamson
