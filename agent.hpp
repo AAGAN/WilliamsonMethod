@@ -13,7 +13,7 @@ class agent
     public:
         agent();
         ~agent();
-        agent(int i); //!< 1 = Halon 1301 , 2 = Novec 1230
+        explicit agent(int i); //!< 1 = Halon 1301 , 2 = Novec 1230
         
         //! accessor functions
         std::vector<double> get_temperature() const {return temperature_;}

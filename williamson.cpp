@@ -16,8 +16,7 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
   
   
   double molecular_weight_ratio,      // molecular weight ratio of nitrogen vs agent
-         coeff_dissol_expan,          // effect of dissolved nitrogen on the liquid volume
-         N, L1, L2, V2, P2, P3, E1, E5, E6, R1, R2, R3, A1, A2, A3;
+         coeff_dissol_expan;          // effect of dissolved nitrogen on the liquid volume
   
   
   //! Set molecular weight ratio and coefficient of dissolved expansion according to agent type
@@ -43,8 +42,8 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
   std::vector<double> vapor_p = extinguishing_agent->get_vapor_p();
   std::vector<double> liquid_spec_vol = extinguishing_agent->get_liquid_spec_vol();
   std::vector<double> vapor_spec_vol = extinguishing_agent->get_vapor_spec_vol();
-  std::vector<double> liquid_enthal = extinguishing_agent->get_liquid_enthal();
-  std::vector<double> vapor_enthal = extinguishing_agent->get_vapor_enthal();
+  // std::vector<double> liquid_enthal = extinguishing_agent->get_liquid_enthal();
+  // std::vector<double> vapor_enthal = extinguishing_agent->get_vapor_enthal();
   std::vector<double> liquid_entro = extinguishing_agent->get_liquid_entro();
   std::vector<double> vapor_entro = extinguishing_agent->get_vapor_entro();
   std::vector<double> c_henry = extinguishing_agent->get_c_henry();
@@ -69,6 +68,8 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
   //! Loop through all temperatures
   for ( ; count_T < temperature.size(); count_T++)
   {
+    double N, L1, L2, V2, P2, P3, E1, E5, E6, R1, R2, R3, A1, A2, A3;
+    
     N = current_state.liquid*0.01*current_state.n_pressure/c_henry[count_T-1] + current_state.vapor*molecular_weight_ratio*current_state.n_pressure/vapor_p[count_T-1]; // weight of nitrogen in container
     P2 = current_state.n_pressure - 1;    // assumed new nitrogen pressure after discharge
     P3 = P2 - 1;                          // random initialization for P3

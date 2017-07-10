@@ -9,7 +9,7 @@ Use g++ (GNU c++ compiler) instead of gcc (GNU c or c++) when linking files. Oth
 Agent class defined. Each physical property is a vector read in from corresponding agent property file. agent.cpp assumes temperature data in an ascending order.
 
 Each agent is read in differently.
-For Halon 1301 the Williamson paper has its Henry's constant data, but for Novec 1230 Tom assumes Henry's constant is linear with temperature in VB code.
+For Halon 1301 the Williamson paper has its Henry's constant data, but for Novec 1230 Tom assumes Henry's constant is linear with temperature in VB code, and we are currently using the same expression.
 Verification cases simply using a constant value for Henry's Law constant show that it's not affecting the pressure recession table.
 
 Data file should be in English units, but initial storage conditions are input with SI units. Transition in williamson.cpp to English units to be consistent with the paper.
@@ -38,7 +38,8 @@ Can change later and do a temperature search, but the storage temperature should
 * Tank discharge calculation assumes unit volume and pipe expansion calculation assumes unit mass.
 
 * Molecular weight ratio is 0.188 in paper but really needs to be changed depending on the agent.
-* Also needs to be changed for different agents is the empirical coefficient for the effect of dissolved nitrogen on the liquid volume.
+
+* Also needs to be changed for different agents is the empirical coefficient for the effect of dissolved nitrogen on the liquid volume. It's 0.053 for Halon according to Williamson and 0.0429 for Novec according to Tom.
 
 
 
