@@ -6,6 +6,7 @@
 #include <stdlib.h> // atof or strtof
 
 // using namespace std;
+// Remember to use the namespace std:: !!
 
 
 //! class default constructor
@@ -30,7 +31,7 @@ agent::~agent()
 }
   
   
-// Class constructor based on agent type. Remember to use the namespace std:: !!
+// Class constructor based on agent type.
 agent::agent(int i)
 {
     std::string property_file_name;
@@ -38,7 +39,8 @@ agent::agent(int i)
     
     if (i==1) //! Halon 1301
     {
-        property_file_name = "Halon1301_property.csv"; // Use property data file for Halon 1301
+        //! Use property data file "Halon1301_property.csv" for Halon 1301
+        property_file_name = "Halon1301_property.csv";
         
         std::ifstream infile(property_file_name.c_str());
     
@@ -67,7 +69,7 @@ agent::agent(int i)
             getline(num_list, one_number, ',');
             c_henry_.insert(c_henry_.begin(), atof(one_number.c_str()));
         
-            // Expect 9 numbers from each line
+            //! Expect 9 numbers from each line input
             if (!num_list.eof())
             {
                 std::cout << "Unexpected: didn't reach end of line!" << std::endl;
@@ -84,7 +86,8 @@ agent::agent(int i)
     
     else if (i==2) //! Novec 1230
     {
-        property_file_name = "Novec1230_property.csv"; // Use property data file for Novec 1230
+        //! Use property data file "Novec1230_property.csv" for Novec 1230
+        property_file_name = "Novec1230_property.csv";
         
         std::ifstream infile(property_file_name.c_str()); // input data stream from file
     
@@ -126,11 +129,11 @@ agent::agent(int i)
             // getline(num_list, one_number, ',');
             // c_henry_.push_back(atof(one_number.c_str()));
         
-            // Use a linear relation between Henry's constant and temperature
+            //! Use a linear relation between Henry's constant and temperature for Novec
             c_henry_.insert(c_henry_.begin(), 0.9286*temperature_.front() + 3494.6);
             // c_henry_.insert(c_henry_.begin(), 3600);
         
-            // Expect 8 numbers from each line
+            //! Expect 8 numbers from each line
             if (!num_list.eof())
             {
                 std::cout << "Unexpected: didn't reach end of line!" << std::endl;

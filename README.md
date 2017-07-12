@@ -13,6 +13,7 @@ For Halon 1301 the Williamson paper has its Henry's constant data, but for Novec
 Verification cases simply using a constant value for Henry's Law constant show that it's not affecting the pressure recession table.
 
 Data file should be in English units, but initial storage conditions are input with SI units. Transition in williamson.cpp to English units to be consistent with the paper.
+If the data file is in a temperature descent order then need to note and push_back into vectors when reading in.
 
 Temperature unit in entropy is Rankine, but 1 degree change in Rankine is the same as 1 degree in Fahrenheit.
 
@@ -32,14 +33,17 @@ The slight difference could be due to many reasons:
 
 # Caveats:
 
-* Storage temperature has to start from the highest temperature in data file! Otherwise need to note and push_back into vectors.
-Can change later and do a temperature search, but the storage temperature should still exist in data file.
+* Change the storage conditions (starting P, T, D) for each run.
+
+* Storage temperature has to exist in data file.
+* If storage temperature is starting from a lower temperature then it's rounded to the closest temperature in data and start from there. Need to switch to a temperature search in williamson.cpp if the temperature in data is not integer 
 
 * Tank discharge calculation assumes unit volume and pipe expansion calculation assumes unit mass.
 
 * Molecular weight ratio is 0.188 in paper but really needs to be changed depending on the agent.
-
 * Also needs to be changed for different agents is the empirical coefficient for the effect of dissolved nitrogen on the liquid volume. It's 0.053 for Halon according to Williamson and 0.0429 for Novec according to Tom.
 
-
+* It seems the temperature at which the agent depletes depends a lot on the threshold. Theoretically it converges more precisely with smaller threshold, but it turns out that if the threshold is too small the solution would even diverge.
+The threshold also depends on initial conditions.
+It is reassuring that the tank state discharge curve (pressure vs. precent outage) does not change with the threshold.
 

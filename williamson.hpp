@@ -2,7 +2,7 @@
 #include "agent.hpp"
 #include <vector>
 
-//! A structure with the state of the tank during discharge.
+//! A structure for the state of tank during discharge.
 struct tank_state
 {
   double temperature;         //!< container temperature
@@ -16,12 +16,12 @@ struct tank_state
 };
 
 
-//! Williamson method as in the paper
+//! Williamson method for the container state during discharge implemented as in the paper
 int williamson
 (
     agent*,                       //!< pointer to the agent class
-    int,                          //!< indicator of agent type
-    std::vector<tank_state>&,     //!< a reference to the Tank_state vector in main function.
+    int,                          //!< indicator of agent type: 1 = Halon 1301 , 2 = Novec 1230
+    std::vector<tank_state>&,     //!< a reference to the Tank_state vector
     double,                       //!< initial partial pressure of nitrogen
     double,                       //!< initial storage temperature
     double                        //!< initial fill density of agent

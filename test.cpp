@@ -5,6 +5,13 @@
 #include <fstream>
 #include <vector>
 
+
+//! Define the problem and call Williamson Method
+/** 
+Define agent type and initial storage conditions (filling density, temperature, nitrogen partial temperature).
+Print out the state during discharge, until the point when agent is depleted or reaching the lowest temperature available in data.
+*/
+
 int main()
 {
   
@@ -19,9 +26,9 @@ int main()
   agent * p_agent = & extinguishing_agent;
   
   // Initial storage conditions
-  double P = 1010.3 * 6894.76;                    // Partial pressure of nitrogen (Pa)
-  double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  double D = 1400; // 70 * 16.0185;               // Filling density of storage container (kg/(m^3))
+  double P = 1009 * 6894.76; // 1010.3 * 6894.76;                    // Partial pressure of nitrogen (Pa)
+  double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  double D = 600; // 70 * 16.0185;               // Filling density of storage container (kg/(m^3))
 
   std::vector<tank_state> Tank_state;
   
@@ -58,7 +65,7 @@ int main()
     {
       // Print to screen
       std::cout << Tank_state[i].temperature << ", " 
-                << Tank_state[i].pressure - 14.7 << ", " 
+                << Tank_state[i].pressure - 14.7 << ", "   // transfer pressure from psi to psig
                 << Tank_state[i].discharge << ", " 
                 << Tank_state[i].liquid << ", " 
                 << Tank_state[i].vapor << ", " 
@@ -68,7 +75,7 @@ int main()
       
       // Print to file
       outfile   << Tank_state[i].temperature << ", " 
-                << Tank_state[i].pressure - 14.7 << ", " 
+                << Tank_state[i].pressure - 14.7 << ", "   // transfer pressure from psi to psig
                 << Tank_state[i].discharge << ", " 
                 << Tank_state[i].liquid << ", " 
                 << Tank_state[i].vapor << ", " 
