@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['percent_5fdischarge',['percent_discharge',['../structtank__state.html#a26994a1c2b134820b4ef0ad9b2a55dd4',1,'tank_state']]],
-  ['pressure',['pressure',['../structtank__state.html#a894cb5ea648726b275ec33c539e1de3e',1,'tank_state']]]
+  ['n_5fpressure',['n_pressure',['../structtank__state.html#a5d5c41b554f993438f954996093d5477',1,'tank_state']]]
 ];

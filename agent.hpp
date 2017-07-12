@@ -2,17 +2,17 @@
 #include <vector>
 
 // brief description
-//! The agent class stores relevant physical properties of a specific agent
+//! The agent class stores and accesses relevant physical properties of a specific agent.
 
 // detailed description
-/** It contains constructors, destructor, accessors, private parameter members */
+/** It contains constructors, destructor, accessors and private parameter members. */
 
 class agent
 {
     public:
         agent();
         ~agent();
-        explicit agent(int i); //!< Class constructor based on agent type: 1 = Halon 1301 , 2 = Novec 1230
+        explicit agent(int i); //!< Class constructor based on agent type i: 1 = Halon 1301 , 2 = Novec 1230
         
         // accessor functions
         std::vector<double> get_temperature() const {return temperature_;}              //!< access temperature vector
