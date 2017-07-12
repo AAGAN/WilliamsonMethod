@@ -2,7 +2,7 @@
 #include "agent.hpp"
 #include <vector>
 
-//! A structure with the state of the tank during discharge.
+//! A structure for the state of tank during discharge.
 struct tank_state
 {
   double temperature;         //!< container temperature
