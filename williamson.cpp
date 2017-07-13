@@ -6,7 +6,10 @@
 #include <algorithm>    // std::lower_bound
 
 
-// Williamson method implementation
+// ************************************************************
+// Williamson method implementation part 1
+// ************************************************************
+
 int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_state> &Tankstate, double P, double T, double D)
 {
   //! Convert storage conditions from SI units to English units
@@ -18,7 +21,6 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
   
   double molecular_weight_ratio,      // molecular weight ratio of nitrogen vs agent
          coeff_dissol_expan;          // effect of dissolved nitrogen on the liquid volume
-  
   
   //! Set molecular weight ratio and coefficient of dissolved volume expansion according to agent type
   if (agent_type == 1) // Halon
@@ -67,7 +69,7 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
   
   //! Initialize the tank state
   tank_state current_state; // define a current tank state
-  current_state.temperature = T;
+  current_state.temperature = temperature[count_T];
   current_state.pressure = P + vapor_p[count_T];
   current_state.discharge = 0.0;
   current_state.liquid = (1-D*vapor_spec_vol[count_T]) / (liquid_spec_vol[count_T]*(1+coeff_dissol_expan*P/c_henry[count_T]) - vapor_spec_vol[count_T]); // assuming unit volume!!
@@ -99,7 +101,7 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
     A1 = R1*E1 - (1 + current_state.n_pressure/vapor_p[count_T-1]) * vapor_entro[count_T-1];
     
     //! Converging pressure at one step
-    double P_thres = 0.5;                          // pressure threshold (psi)
+    double P_thres = 0.05;                          // pressure threshold (psi)
     while ( std::abs(P3 - P2) > P_thres )           // loop if pressure difference is larger than threshold
     {
       E5 = (1 + coeff_dissol_expan*P2/c_henry[count_T]) * liquid_spec_vol[count_T];
@@ -142,12 +144,131 @@ int williamson(agent *extinguishing_agent, int agent_type, std::vector<tank_stat
     }
     else
     {
-      std::cout << "Liquid agent depleted!" << std::endl;
+      std::cout << std::endl << "Liquid agent depleted at temperature " << current_state.temperature << "(F)" << std::endl << std::endl;
       return 0;
     }
     
   
   }
 
+  return 0;
+}
+
+
+
+
+
+// ************************************************************
+// Williamson method implementation part 2 (overloading)
+// ************************************************************
+
+int williamson(agent *extinguishing_agent, int agent_type, std::vector<pipe_state> &Pipestate, double P, double T)
+{
+  // assume the pressure and temperature read in here are already in English units
+  
+  
+  double N;                           // nitrogen weight
+  
+  double molecular_weight_ratio,      // molecular weight ratio of nitrogen vs agent
+         coeff_dissol_expan;          // effect of dissolved nitrogen on the liquid volume
+  
+  //! Set molecular weight ratio and coefficient of dissolved volume expansion according to agent type
+  if (agent_type == 1)                    // Halon
+  {
+    molecular_weight_ratio = 0.188;
+    coeff_dissol_expan = 0.053;
+  }
+  else if (agent_type == 2)               // Novec
+  {
+    molecular_weight_ratio = 0.088636;
+    coeff_dissol_expan = 0.0429;
+  }
+  else                                    // Neither Halon nor Novec. Bad input. Abort the program.
+  {
+    std::cout << "Wrong agent indicator!" << std::endl;
+    abort();
+  }
+  
+  
+  //! Accessing agent properties
+  std::vector<double> temperature = extinguishing_agent->get_temperature();
+  std::vector<double> vapor_p = extinguishing_agent->get_vapor_p();
+  std::vector<double> liquid_spec_vol = extinguishing_agent->get_liquid_spec_vol();
+  std::vector<double> vapor_spec_vol = extinguishing_agent->get_vapor_spec_vol();
+  std::vector<double> liquid_enthal = extinguishing_agent->get_liquid_enthal();
+  std::vector<double> vapor_enthal = extinguishing_agent->get_vapor_enthal();
+  // std::vector<double> liquid_entro = extinguishing_agent->get_liquid_entro();
+  // std::vector<double> vapor_entro = extinguishing_agent->get_vapor_entro();
+  std::vector<double> c_henry = extinguishing_agent->get_c_henry();
+  
+  
+  
+  // Since the temperature from recession table comes from the data temperature and therefore exists, no need for temperature search and check and directly find its position.
+  int count_T = round(temperature[0] - T); // count the temperature step number
+  
+  //! Initialize the pipe state
+  pipe_state current_state;                           // define a current pipe state
+  N = 0.01*P/c_henry[count_T];                        // nitrogen weight does not change at each step
+  current_state.temperature = temperature[count_T];
+  current_state.pressure = P + vapor_p[count_T];
+  current_state.liquid = 1;                           // expansion starts with unit mass of liquid agent and no vapor
+  current_state.vapor = 0; 
+  current_state.n_pressure = P;                       // share tank nitrogen pressure at pipe beginning
+  current_state.density = (1+N) / (liquid_spec_vol[count_T]*(1+coeff_dissol_expan*P/c_henry[count_T])); // initial density (only liquid exists)
+  Pipestate.push_back(current_state);                 // Record the initial pipe state
+  count_T++;
+
+  
+  
+  //! Loop through all temperatures
+  /**
+   * Solve for the pressure and density at each temperature step through the conservations of mass and enthalpy.
+   */
+  for ( ; count_T < temperature.size(); count_T++)
+  {
+    double L2, V2, P2, P3, E1, E2, E6, E7, E3, E4, E8, E9; // intermediate variables
+    P2 = current_state.n_pressure - 1;    // assumed new nitrogen pressure after discharge
+    P3 = P2 - 1;                          // random initialization for P3
+  
+    // Intermediate parameters
+    E1 = (1 + coeff_dissol_expan*current_state.n_pressure/c_henry[count_T-1]) * liquid_enthal[count_T-1];
+    E2 = (1 + current_state.n_pressure/vapor_p[count_T-1]) * vapor_enthal[count_T-1];
+    E6 = 1 + 0.01*current_state.n_pressure/c_henry[count_T-1];
+    E7 = 1 + molecular_weight_ratio*current_state.n_pressure/vapor_p[count_T-1];
+    
+    
+    //! Converging pressure at one step
+    double P_thres = 0.1;                           // pressure threshold (psi)
+    while ( std::abs(P3 - P2) > P_thres )           // loop if pressure difference is larger than threshold
+    {
+      E3 = (1 + coeff_dissol_expan*P2/c_henry[count_T]) * liquid_enthal[count_T];
+      E4 = (1 + P2/vapor_p[count_T]) * vapor_enthal[count_T];
+      E8 = 1 + 0.01*P2/c_henry[count_T];
+      E9 = 1 + molecular_weight_ratio*P2/vapor_p[count_T];
+      
+      L2 = (current_state.liquid*(E1*E9-E6*E4) + current_state.vapor*(E2*E9-E7*E4)) / (E3*E9-E8*E4);  // new liquid weight
+      V2 = 1 - L2;                                                                                    // new vapor weight
+      P3 = N / (L2*0.01/c_henry[count_T] + V2*molecular_weight_ratio/vapor_p[count_T]);               // calculated new nitrogen pressure after expansion
+  
+      // Adapt P2 towards convergence
+      if (P3 < (P2-P_thres))        P2 = P2 - P_thres;
+      else if (P3 > (P2+P_thres))   P2 = P2 + P_thres;
+    }
+    
+    
+    //! Update current pipe state
+    current_state.temperature = temperature[count_T];
+    current_state.pressure = P2 + vapor_p[count_T];
+    current_state.liquid = L2;
+    current_state.vapor = V2;
+    current_state.n_pressure = P2;
+    current_state.density = (1+N) / (L2*liquid_spec_vol[count_T]*(1+coeff_dissol_expan*P2/c_henry[count_T]) + V2*vapor_spec_vol[count_T]);
+    
+    //! Store the current state
+    Pipestate.push_back(current_state);
+  
+  }
+  
+  
   return 0;
 }
