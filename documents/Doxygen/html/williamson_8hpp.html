@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Williamson Method Container Discharge: williamson.hpp File Reference</title>
+<title>Williamson Method for Clean Agent Discharge: C:/Users/darenliu/Documents/GitHub/WilliamsonMethod/williamson.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Williamson Method Container Discharge
+   <div id="projectname">Williamson Method for Clean Agent Discharge
    </div>
   </td>
  </tr>
@@ -83,7 +83,7 @@ $(document).ready(function(){initNavTree('williamson_8hpp.html','');});
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">williamson.hpp File Reference</div>  </div>
+<div class="title">C:/Users/darenliu/Documents/GitHub/WilliamsonMethod/williamson.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="agent_8hpp_source.html">agent.hpp</a>&quot;</code><br />
@@ -96,16 +96,22 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtank__state.html">tank_state</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A structure for the state of tank during discharge.  <a href="structtank__state.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpipe__state.html">pipe_state</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A structure for the state of the pipe.  <a href="structpipe__state.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a61ca23775609d3ac4598ebb7af6b5953"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="williamson_8hpp.html#a61ca23775609d3ac4598ebb7af6b5953">williamson</a> (<a class="el" href="classagent.html">agent</a> *, int, std::vector&lt; <a class="el" href="structtank__state.html">tank_state</a> &gt; &amp;, double, double, double)</td></tr>
-<tr class="memdesc:a61ca23775609d3ac4598ebb7af6b5953"><td class="mdescLeft">&#160;</td><td class="mdescRight">Williamson method for the container state during discharge implemented as in the paper.  <a href="#a61ca23775609d3ac4598ebb7af6b5953">More...</a><br /></td></tr>
+<tr class="memdesc:a61ca23775609d3ac4598ebb7af6b5953"><td class="mdescLeft">&#160;</td><td class="mdescRight">Williamson method for the container state during discharge implemented as part one of the paper.  <a href="#a61ca23775609d3ac4598ebb7af6b5953">More...</a><br /></td></tr>
 <tr class="separator:a61ca23775609d3ac4598ebb7af6b5953"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a555645205bc6c4076c6859243ffe1506"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="williamson_8hpp.html#a555645205bc6c4076c6859243ffe1506">williamson</a> (<a class="el" href="classagent.html">agent</a> *, int, std::vector&lt; <a class="el" href="structpipe__state.html">pipe_state</a> &gt; &amp;, double, double)</td></tr>
+<tr class="memdesc:a555645205bc6c4076c6859243ffe1506"><td class="mdescLeft">&#160;</td><td class="mdescRight">Williamson method for the pipe state implemented as part two of the paper.  <a href="#a555645205bc6c4076c6859243ffe1506">More...</a><br /></td></tr>
+<tr class="separator:a555645205bc6c4076c6859243ffe1506"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a61ca23775609d3ac4598ebb7af6b5953"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61ca23775609d3ac4598ebb7af6b5953">&#9670;&nbsp;</a></span>williamson()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a61ca23775609d3ac4598ebb7af6b5953">&#9670;&nbsp;</a></span>williamson() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -154,7 +160,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Williamson method for the container state during discharge implemented as in the paper. </p>
+<p>Williamson method for the container state during discharge implemented as part one of the paper. </p>
 <p>Convert storage conditions from SI units to English units</p>
 <p>Set molecular weight ratio and coefficient of dissolved volume expansion according to agent type</p>
 <p>Accessing agent properties</p>
@@ -165,7 +171,66 @@ Functions</h2></td></tr>
 <p>Update current container state</p>
 <p>Make sure there is still liquid agent in container </p>
 
-<p class="definition">Definition at line <a class="el" href="williamson_8cpp_source.html#l00010">10</a> of file <a class="el" href="williamson_8cpp_source.html">williamson.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="williamson_8cpp_source.html#l00013">13</a> of file <a class="el" href="williamson_8cpp_source.html">williamson.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a555645205bc6c4076c6859243ffe1506"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a555645205bc6c4076c6859243ffe1506">&#9670;&nbsp;</a></span>williamson() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int williamson </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classagent.html">agent</a> *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="structpipe__state.html">pipe_state</a> &gt; &amp;&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Williamson method for the pipe state implemented as part two of the paper. </p>
+<p>This overloads the previous williamson implementation. </p>
+<p>Set molecular weight ratio and coefficient of dissolved volume expansion according to agent type</p>
+<p>Accessing agent properties</p>
+<p>Initialize the pipe state</p>
+<p>Loop through all temperatures</p>
+<p>Solve for the pressure and density at each temperature step through the conservations of mass and enthalpy.</p>
+<p>Converging pressure at one step</p>
+<p>Update current pipe state</p>
+<p>Store the current state </p>
+
+<p class="definition">Definition at line <a class="el" href="williamson_8cpp_source.html#l00165">165</a> of file <a class="el" href="williamson_8cpp_source.html">williamson.cpp</a>.</p>
 
 </div>
 </div>
