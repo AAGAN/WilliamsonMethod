@@ -1,100 +1,101 @@
-#include "agent.hpp"
 #include "williamson.hpp"
-#include <assert.h>
+#include <assert.h>       // assert function helps debugging
 #include <iostream>
 #include <fstream>
 #include <vector>
 
 
+
 //! Define the problem and call Williamson Method
 /** 
-Define agent type and initial storage conditions (filling density, temperature, nitrogen partial temperature).
-Print out the state during discharge, until the point when agent is depleted or reaching the lowest temperature available in data.
+Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature).
+Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first.
+Pipe expansion state is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first.
 */
 
 int main()
 {
   
-  // read in property data from files or best fit function: 'agent property file'
-  int agent_type = 1;
-  /*
-  initialize the instance with agent type
-  1 = Halon 1301
-  2 = Novec 1230
-  */
-  agent extinguishing_agent(agent_type); // agent instance
-  agent * p_agent = & extinguishing_agent;
+  // ************************************************************
+  //! read in agent property data from files
+  // ************************************************************
+  // Use property data file "Halon1301_property.csv" for Halon 1301
+  std::string property_file_name = "Halon1301_property.csv";
+  // Use property data file "Novec1230_property.csv" for Novec 1230
+  // std::string property_file_name = "Novec1230_property.csv";
+        
+        
+
+  // ************************************************************
+  //! Set molecular weight ratio and coefficient of dissolved volume expansion according to agent
+  // ************************************************************
+  double molecular_weight_ratio,      // molecular weight ratio of nitrogen vs agent
+         coeff_dissol_expan;          // effect of dissolved nitrogen on the liquid volume
   
-  // Initial storage conditions
-  double P = 401 * 6894.76; // 1010.3 * 6894.76;                    // Partial pressure of nitrogen (Pa)
+  // Halon
+  molecular_weight_ratio = 0.188;
+  coeff_dissol_expan = 0.053;
+  // Novec
+  // molecular_weight_ratio = 0.088636;
+  // coeff_dissol_expan = 0.0429;
+        
+  
+  
+  // ************************************************************
+  //! Initial storage conditions
+  // ************************************************************
+  // Halon
+  double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
   double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  double D = 70 * 16.0185;               // Filling density of storage container (kg/(m^3))
+  double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
+  // Novec
+  // double P = 1001 * 6894.76;                    // Partial pressure of nitrogen (Pa)
+  // double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  // double D = 700;                              // Filling density of storage container (kg/(m^3))
 
   std::vector<tank_state> Tank_state;
+  tank_state tank_state_snap;
   std::vector<pipe_state> Pipe_state;
+  pipe_state pipe_state_snap;
+  
+  
+  // create an instance of williamson class
+  williamson test_case(property_file_name, molecular_weight_ratio, coeff_dissol_expan);
   
   
   
   // ************************************************************
-  // Solve for tank state
+  //! Solve for tank state
   // ************************************************************
-  
-  int error_code_1 = williamson
+
+  int error_code_1 = test_case.tank
   (
-    p_agent,
-    agent_type,
-    Tank_state,
     P, 
     T, 
     D
   );
-  // Tank_state has been updated after running williamson
+  // Tank_state_ has been updated after running williamson
 
   
   if (error_code_1 == 0)
   {
-    std::cout << "Tank discharge state with a storage temperature of " << Tank_state[0].temperature << " (F) ," 
-              << "a pressure of " << Tank_state[0].pressure << " (psia) " 
-              << "and a filling density of " << D * 0.062428 << " (lb/(ft^3))"
-              << std::endl;
-    std::cout << "temperature (F)" << ", " 
-              << "pressure (psig)" << ", " 
-              << "discharge (lb)" << ", " 
-              << "liquid (lb)" << ", " 
-              << "vapor (lb)" << ", " 
-              << "n_pressure (psi)" << ", " 
-              << "liquid_density (lbs/cu.ft.)" << ", " 
-              << "percent_discharge" << std::endl;
+    // Print to screen
+    test_case.print_tank_state_en();
               
+    
+    // Write to file
     std::string container_discharge_file;                             // The file to hold container state during discharge
     container_discharge_file = "Halon1301_container_discharge.csv";
     // container_discharge_file = "Novec1230_container_discharge.csv";
-    std::ofstream outfile(container_discharge_file.c_str());
-  
-    for (int i = 0; i < Tank_state.size(); i++) 
-    {
-      // Print to screen
-      std::cout << Tank_state[i].temperature << ", " 
-                << Tank_state[i].pressure - 14.7 << ", "   // transfer pressure from psi to psig
-                << Tank_state[i].discharge << ", " 
-                << Tank_state[i].liquid << ", " 
-                << Tank_state[i].vapor << ", " 
-                << Tank_state[i].n_pressure << ", " 
-                << Tank_state[i].liquid_density << ", " 
-                << Tank_state[i].percent_discharge << std::endl;
-      
-      // Print to file
-      outfile   << Tank_state[i].temperature << ", " 
-                << Tank_state[i].pressure - 14.7 << ", "   // transfer pressure from psi to psig
-                << Tank_state[i].discharge << ", " 
-                << Tank_state[i].liquid << ", " 
-                << Tank_state[i].vapor << ", " 
-                << Tank_state[i].n_pressure << ", " 
-                << Tank_state[i].liquid_density << ", " 
-                << Tank_state[i].percent_discharge << std::endl;
-    }
-    std::cout << std::endl;
-    outfile.close();
+    test_case.write_tank_state_en(container_discharge_file);
+    
+    
+    // Access the tank state vector
+    Tank_state = test_case.get_tank_state_si();
+    
+    
+    // Access the tank state structure at a time snapshot
+    tank_state_snap = test_case.get_tank_state_si(T);
   }
   
   else
@@ -105,18 +106,12 @@ int main()
   
   
   // ************************************************************
-  // Solve for pipe state
+  //! Solve for pipe state at a given discharging snapshot
   // ************************************************************
   
-  
-  // Need to decide on the method for pipe input
-  int tank_line = 16; // The line number in the tank state table
-  
-  int error_code_2 = williamson
+  int tank_line = 6; // The line number in the tank state table
+  int error_code_2 = test_case.pipe
   (
-    p_agent,
-    agent_type,
-    Pipe_state,
     Tank_state[tank_line].n_pressure, 
     Tank_state[tank_line].temperature
   );
@@ -124,42 +119,25 @@ int main()
   
   if (error_code_2 == 0)
   {
-    std::cout << "Pipe expansion state with a starting temperature of " << Tank_state[tank_line].temperature << " (F) " 
-              << "and a pressure of " << Tank_state[tank_line].pressure - 14.7 << " (psig) " 
-              << std::endl;
-    std::cout << "temperature (F)" << ", " 
-              << "pressure (psig)" << ", " 
-              << "liquid (lb)" << ", " 
-              << "vapor (lb)" << ", " 
-              << "n_pressure (psi)" << ", " 
-              << "density (lbs/cu.ft.)" << std::endl;
+    // Print to screen
+    test_case.print_pipe_state_en();
+
               
+    // Write to file
     std::string pipe_expansion_file;                             // The file to hold pipe state during expansion
     pipe_expansion_file = "Halon1301_pipe_expansion.csv";
     // pipe_expansion_file = "Novec1230_pipe_expansion.csv";
-    std::ofstream outfile(pipe_expansion_file.c_str());
-  
-    for (int i = 0; i < Pipe_state.size(); i++) 
-    {
-      // Print to screen
-      std::cout << Pipe_state[i].temperature << ", " 
-                << Pipe_state[i].pressure - 14.7 << ", "   // transfer pressure from psi to psig
-                << Pipe_state[i].liquid << ", " 
-                << Pipe_state[i].vapor << ", " 
-                << Pipe_state[i].n_pressure << ", " 
-                << Pipe_state[i].density << std::endl;
-      
-      // Print to file
-      outfile   << Pipe_state[i].temperature << ", " 
-                << Pipe_state[i].pressure - 14.7 << ", "   // transfer pressure from psi to psig
-                << Pipe_state[i].liquid << ", " 
-                << Pipe_state[i].vapor << ", " 
-                << Pipe_state[i].n_pressure << ", " 
-                << Pipe_state[i].density << std::endl;
-    }
-    std::cout << std::endl;
-    outfile.close();
+    test_case.write_pipe_state_en(pipe_expansion_file);
+    
+    
+    // Access the pipe state vector
+    Pipe_state = test_case.get_pipe_state_si();
+    
+    
+    // Access the pipe state structure at a time snapshot
+    pipe_state_snap = test_case.get_pipe_state_si(Tank_state[tank_line].temperature);
   }
+  
   else
   {
     std::cout << "williamson code part 2 exited with code " << error_code_2 << std::endl;
