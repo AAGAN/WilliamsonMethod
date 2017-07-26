@@ -65,6 +65,7 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
 /**
  * Takes initial storage conditions and calculates container state during discharge, saves in the Tank_state_ vector.
  * Takes in quantities in SI units, but calculations and results are saved in English units.
+ * Assuming the property data file is in integer temperature and drops one degree F each line!!
  */
 int williamson::tank (double P, double T, double D)
 {
@@ -78,7 +79,6 @@ int williamson::tank (double P, double T, double D)
   D = D / 16.0185;                  // convert from kg/(m^3) to lb/(ft^3)
   
   
-  // Assume the property data file is in integer temperature and drops one degree F each line!!
   // Find the integer temperature in data file closest to the storage temperature and starts from there.
   int count_T = round(temperature_[0] - T); // count the temperature step number
   // If data is not degree by degree in temperature then attempt to do a temperature search.

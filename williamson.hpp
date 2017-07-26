@@ -41,6 +41,8 @@ It calculates, accesses and prints the tank state and pipe state.
 
 Takes arguments in SI units but converts to English units inside implementation.
 
+Outputs can choose English or SI units.
+
 The accessors are overloaded so that if no argument is given then a state vector would be returned, and if a temperature is given as an argument then it will interpolate and return the state at that temperature.
 */
 

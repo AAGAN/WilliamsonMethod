@@ -8,7 +8,7 @@
 
 //! Define the problem and call Williamson Method
 /** 
-Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature).
+Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units.
 Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first.
 Pipe expansion state is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first.
 */
@@ -29,8 +29,8 @@ int main()
   // ************************************************************
   //! Set molecular weight ratio and coefficient of dissolved volume expansion according to agent
   // ************************************************************
-  double molecular_weight_ratio,      // molecular weight ratio of nitrogen vs agent
-         coeff_dissol_expan;          // effect of dissolved nitrogen on the liquid volume
+  double molecular_weight_ratio,      // molecular weight ratio of inert gas vs agent
+         coeff_dissol_expan;          // effect of dissolved inert gas on the liquid volume
   
   // Halon
   molecular_weight_ratio = 0.188;
@@ -52,6 +52,7 @@ int main()
   // double P = 1001 * 6894.76;                    // Partial pressure of nitrogen (Pa)
   // double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
   // double D = 700;                              // Filling density of storage container (kg/(m^3))
+
 
   std::vector<tank_state> Tank_state;
   tank_state tank_state_snap;
