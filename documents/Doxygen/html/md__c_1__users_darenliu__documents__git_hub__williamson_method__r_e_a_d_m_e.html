@@ -86,14 +86,11 @@ $(document).ready(function(){initNavTree('md__c_1__users_darenliu__documents__gi
 <div class="textblock"><h2>c++ implementation of Williamson's method</h2>
 <p>Use g++ (GNU c++ compiler) instead of gcc (GNU c or c++) when linking files. Otherwise main function doesn't recognize the functions defined in other cpps.</p>
 <p>Agent class defined. Each physical property is a vector read in from corresponding agent property file.</p>
-<p>Each agent is read in differently. For Halon 1301 the Williamson paper has its Henry's constant data, but for Novec 1230 Tom assumes Henry's constant is linear with temperature in VB code, and we are currently using the same expression. Verification cases simply using a constant value for Henry's Law constant show that it's not affecting the pressure recession table.</p>
-<p>Data file should be in English units, but initial storage conditions are input with SI units. Transition in <a class="el" href="williamson_8cpp.html">williamson.cpp</a> to English units to be consistent with the paper. Output then stays in English units.</p>
-<p><a class="el" href="agent_8cpp.html">agent.cpp</a> assumes temperature data in an ascending order. If the data file is in a temperature descent order then need to note and push_back into vectors when reading in.</p>
+<p>Each agent is read in from its specific file. The current data file used for Halon is from Williamson paper and that for Novec is from Tom. For Halon 1301 the Williamson paper has its Henry's constant data, but for Novec 1230 Tom assumes Henry's constant is linear with temperature in VB code, and we are currently using the same expression. Verification cases simply using a constant value for Henry's Law constant show that it's not affecting the pressure recession table.</p>
+<p>Agent property file needs to be prepared with data in a temperature-ascending order.</p>
+<p>Data file should be in English units, but initial storage conditions are input with SI units. Transition in williamson implementation to English units to be consistent with the paper. Output can choose to be in English or SI units.</p>
 <p>Temperature unit in entropy is Rankine, but 1 degree change in Rankine is the same as 1 degree in Fahrenheit.</p>
-<p>The current data file used for Halon is from Williamson paper and that for Novec is from Tom.</p>
-<p>Williamson function for pipe expansion overloads the williamson for <a class="el" href="structtank__state.html" title="A structure for the state of tank during discharge. ">tank_state</a> with different parameters.</p>
 <p>Tank discharge calculation assumes unit volume and conservations of mass, volume and entropy, while pipe expansion calculation assumes unit agent mass and conservations of mass and enthalpy. Other than the difference in equations the solution methodology is the same.</p>
-<p>The output of the first part of the Williamson method would be a vector of <a class="el" href="structtank__state.html" title="A structure for the state of tank during discharge. ">tank_state</a> structures. That of the second part would be a vector of <a class="el" href="structpipe__state.html" title="A structure for the state of the pipe. ">pipe_state</a>.</p>
 <p>The calculated pressure recession matches Figure H.1(b) of NFPA 12A for Halon 1301. The slight difference could be due to many reasons:</p><ul>
 <li>Unlike in the paper which uses a linear relation between liquid entropy and temperature, directly use the liquid entropy data.</li>
 <li>Different pressure convergence criterion and threshold value</li>
@@ -101,13 +98,14 @@ $(document).ready(function(){initNavTree('md__c_1__users_darenliu__documents__gi
 </ul>
 <h1>Caveats:</h1>
 <ul>
-<li>Change the storage conditions (starting P, T, D) for each run.</li>
-<li>Storage temperature has to exist in data file.</li>
-<li>If storage temperature is starting from a mid-range temperature then it's rounded to the closest temperature in data and start from there. Need to switch to a temperature search in <a class="el" href="williamson_8cpp.html">williamson.cpp</a> if the temperature in data is not integer.</li>
+<li>Change the agent file name, molecular weight ratio and liquid volume expansion coefficient, as well as the storage conditions (starting P, T, D) for each run.</li>
 <li>Molecular weight ratio is 0.188 in paper but really needs to be changed depending on the agent.</li>
 <li>Also needs to be changed for different agents is the empirical coefficient for the effect of dissolved nitrogen on the liquid volume. It's 0.053 for Halon according to Williamson and 0.0429 for Novec according to Tom.</li>
+<li>Storage temperature for tank and starting temperature for pipe has to exist in data file.</li>
+<li>If temperature is starting from a mid-range temperature then it's rounded to the closest temperature in data and start from there. Need to switch to a temperature search if the temperature in data is not integer.</li>
 <li>It seems the temperature at which the agent depletes depends a lot on the threshold. Theoretically it converges more precisely with smaller threshold, but it turns out that if the threshold is too small the solution would even diverge. The threshold also depends on initial conditions. It is reassuring that the tank state discharge curve (pressure vs. precent outage) does not change with the threshold.</li>
-<li>Still need to decide on the method of input to be used for pipe starting conditions!! </li>
+<li>Still need to decide on the method of input to be used for pipe starting conditions, so that it starts from an existing state in the recession table!!</li>
+<li>Agent property file must finish with the line for the highest temperature and cannot start with a new line at the end. </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
