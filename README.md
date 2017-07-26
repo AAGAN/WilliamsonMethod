@@ -66,3 +66,6 @@ It is reassuring that the tank state discharge curve (pressure vs. precent outag
 
 * Still need to decide on the method of input to be used for pipe starting conditions!!
 
+* Agent property file must finish with the line for the highest temperature and cannot start with a new line at the end.
+
+
