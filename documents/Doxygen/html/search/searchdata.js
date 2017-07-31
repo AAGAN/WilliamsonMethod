@@ -1,9 +1,9 @@
 var indexSectionsWithContent =
 {
   0: "adglmnprtvw~",
-  1: "apt",
+  1: "aptw",
   2: "artw",
-  3: "agmw~",
+  3: "agmptw~",
   4: "dlnptv",
   5: "w"
 };

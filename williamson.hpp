@@ -32,6 +32,8 @@ struct pipe_state
 
 
 
+
+
 // brief description
 //! A class as an API for the Williamson method.
 
@@ -41,13 +43,19 @@ It calculates, accesses and prints the tank state and pipe state.
 
 Takes arguments in SI units but converts to English units inside implementation.
 
-The accessors are overloaded so that if no argument is given then a state vector would be returned, and if a temperature is given as an argument then it will interpolate and return the state at that temperature.
+Outputs can choose English or SI units.
+
+Tank state accessors include returning the whole vector, returning a specific state at the given temperature or percentage of discharge. Call methods with corresponding names.
+
+The pipe state accessors are overloaded so that if no argument is given then the whole state vector would be returned, and if a temperature is given as an argument then it will interpolate and return the state at that temperature.
+However the accessor aborts if the quoting temperature is outside range.
 */
 
 class williamson
 {
   
     public:
+    
         williamson();
         ~williamson();
         
@@ -106,19 +114,32 @@ class williamson
         std::vector<pipe_state> get_pipe_state_si() const {return Pipe_state_si_;}
         
         //! Access the tank state in English units at a given temperature (K)
-        tank_state get_tank_state_en(double);
+        tank_state get_tank_state_from_T_en(double);
         
         //! Access the tank state in SI units at a given temperature (K)
-        tank_state get_tank_state_si(double);
+        tank_state get_tank_state_from_T_si(double);
+        
+        //! Access the tank state in English units at a given percentage of discharge
+        tank_state get_tank_state_from_percentdischarge_en(double);
+        
+        //! Access the tank state in SI units at a given percentage of discharge
+        tank_state get_tank_state_from_percentdischarge_si(double);
         
         //! Access the pipe state in English units at a given temperature (K)
         pipe_state get_pipe_state_en(double);
         
         //! Access the pipe state in SI units at a given temperature (K)
         pipe_state get_pipe_state_si(double);
+        
+        //! Methods to let the user turn on/off the verbose flag.
+        void verbose_on()           {verbose = true;}
+        void verbose_off()          {verbose = false;}
 
   
     private:
+    
+        bool verbose;                                   // A boolean flag. Default false. Turn on to print running details and messages.
+    
         std::vector<tank_state> Tank_state_en_,         // The vector that holds tank state at all temperatures, in English units
                                 Tank_state_si_;         // in SI units
         std::vector<pipe_state> Pipe_state_en_,         // The vector that holds pipe state at all temperatures, in English units
@@ -139,3 +160,20 @@ class williamson
   
 };
 
+
+
+
+//! Stand along functions: print a state structure
+/** The state should be passed into the print function with corresponding units. User is responsible to guarantee this. */
+        
+//! Print the given tank state in English units to screen
+void print_one_tank_state_en(tank_state);
+        
+//! Print the given tank state in SI units to screen
+void print_one_tank_state_si(tank_state);
+        
+//! Print the given pipe state in English units to screen
+void print_one_pipe_state_en(pipe_state);
+        
+//! Print the given pipe state in SI units to screen
+void print_one_pipe_state_si(pipe_state);

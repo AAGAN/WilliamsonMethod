@@ -37,7 +37,12 @@ agent::~agent()
   
   
 // Agent class constructor
-// No longer use agent indicator. Agent is specified through the property file.
+/** 
+ * No longer use agent indicator. Agent is specified through the properties.
+ * Instead of pushing back, use insert to the front since temperature data in file is in an ascending order.
+ * If the data file is in a temperature descent order then need to note and push_back into vectors when reading in inside agent.cpp.
+ * After insertion these vectors hold properties in a temperature-descending order.
+ */
 agent::agent(std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan)
 {
     
@@ -66,14 +71,13 @@ agent::agent(std::string property_file_name, double molecular_weight_ratio, doub
         getline(infile, input_line);                            // get the string of one line into input_line
         std::istringstream num_list(input_line);                // a stream of this line
         
+        
         // Input one line of data into each property vector.
-        // Instead of pushing back, use insert to the front since temperature data in file is in an ascending order.
-        // After inserting these vectors hold properties in a temperature-descending order.
             
         getline(num_list, one_number, ',');
         temperature_.insert(temperature_.begin(), atof(one_number.c_str()));
         // double current_num = atof(one_number.c_str());               // c_str() adds a terminating null-character at the end
-        // double current_num = strtof(one_number.c_str(), NULL);       // strtof does the same, but also capable of multiple floats in one string.
+        // double current_num = strtof(one_number.c_str(), NULL);       // strtof does the same, but is also capable of multiple floats in one string.
         // temperature_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         vapor_p_.insert(vapor_p_.begin(), atof(one_number.c_str()));

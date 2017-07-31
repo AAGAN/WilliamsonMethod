@@ -85,8 +85,7 @@ $(document).ready(function(){initNavTree('test_8cpp.html','');});
 <div class="title">C:/Users/darenliu/Documents/GitHub/WilliamsonMethod/test.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="agent_8hpp_source.html">agent.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="williamson_8hpp_source.html">williamson.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="williamson_8hpp_source.html">williamson.hpp</a>&quot;</code><br />
 <code>#include &lt;assert.h&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
@@ -117,9 +116,14 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Define the problem and call Williamson Method. </p>
-<p>Define agent type and initial storage conditions (filling density, temperature, nitrogen partial temperature). Print out the state during discharge, until the point when agent is depleted or reaching the lowest temperature available in data. </p>
+<p>Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units. Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first. Pipe expansion state is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first. </p>
+<p>read in agent property data from files</p>
+<p>Set molecular weight ratio and coefficient of dissolved volume expansion according to agent</p>
+<p>Initial storage conditions</p>
+<p>Solve for tank state</p>
+<p>Solve for pipe state at a given discharging snapshot </p>
 
-<p class="definition">Definition at line <a class="el" href="test_8cpp_source.html#l00015">15</a> of file <a class="el" href="test_8cpp_source.html">test.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test_8cpp_source.html#l00016">16</a> of file <a class="el" href="test_8cpp_source.html">test.cpp</a>.</p>
 
 </div>
 </div>
