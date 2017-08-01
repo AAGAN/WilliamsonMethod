@@ -29,13 +29,16 @@ williamson::~williamson()
 
 /**
  * It constructs an agent instance and passes its members to williamson's private members.
+ * Tank_state_ and Pipe_state_ are still empty vectors after this.
+ * 
  * Users don't need to interact with the agent class.
  * Really the agent class might be unnecessary. The agent constructor can just be implemented here.
  */
 williamson::williamson (std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan)
 {
   
-  agent extinguishing_agent(property_file_name, molecular_weight_ratio, coeff_dissol_expan);    // agent instance
+  // Construct an agent instance
+  agent extinguishing_agent(property_file_name, molecular_weight_ratio, coeff_dissol_expan);    
   
   // Save agent properties to williamson members
   temperature_ = extinguishing_agent.get_temperature();
@@ -50,9 +53,10 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
   molecular_weight_ratio_ = extinguishing_agent.get_molecular_weight_ratio();
   coeff_dissol_expan_ = extinguishing_agent.get_coeff_dissol_expan();
   
-  verbose = false;
   
-  // Tank_state_ and Pipe_state_ are still empty vectors
+  P_thres_ = 0.5;         // default pressure convergence threshold (psi)
+  
+  verbose = false;        // default verbose flag state
   
 }
 
@@ -76,26 +80,25 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
 int williamson::tank (double P, double T, double D)
 {
   
-  // pressure convergence threshold (psi)
-  double P_thres = 0.02;
-  
   // Convert storage conditions from SI units to English units
-  P = P / 6894.76;                  // convert from Pa to psi
-  T = (T - 273.15)*(9/5.0) + 32;    // convert from kelvin to fahrenheit
-  D = D / 16.0185;                  // convert from kg/(m^3) to lb/(ft^3)
+  P = P / 6894.76;                        // convert from Pa to psi
+  T = (T - 273.15)*(9/5.0) + 32;          // convert from kelvin to fahrenheit
+  D = D / 16.0185;                        // convert from kg/(m^3) to lb/(ft^3)
+  
   
   
   // Temperature pre-processing
+  
   // If storage temperature is outside the temperature range of data file, abort the program.
   // Allow a small error 0.001 to deal with float number comparison issue: slight difference but essentially equal.
   if ((T < (temperature_.back() - 0.001)) || (T > (temperature_.front() + 0.001)))
   {
     std::cout << "Storage temperature is outside the available temperature data!" << std::endl;
-    abort();
+    return 1;
   }
   
+  
   // Do a temperature search. Use a reverse iterator to find the block in data file that the storage temperature belongs to.
-  // int count_T = round(temperature_[0] - T); // count the temperature step number. Require data to be degree by degree in temperature!!
   std::vector<double>::reverse_iterator T_iter = std::lower_bound (temperature_.rbegin(), temperature_.rend(), T);
   int count_T = temperature_.rend() - T_iter - 1;
   
@@ -139,45 +142,54 @@ int williamson::tank (double P, double T, double D)
   // Otherwise it's close to the upper bound. No need to do anything.
   
   
+  
   // Initialize the tank state
-  tank_state current_state,         // define a current tank state, in English units
-             current_state_si;      // current state in SI units
+  
+  tank_state current_state,               // define a current tank state, in English units
+             current_state_si;            // current state in SI units
              
+  // initial tank state in English units
   current_state.temperature = temperature_[count_T];
   current_state.pressure = P + vapor_p_[count_T];
   current_state.discharge = 0.0;
-  current_state.liquid = (1-D*vapor_spec_vol_[count_T]) / (liquid_spec_vol_[count_T]*(1+coeff_dissol_expan_*P/c_henry_[count_T]) - vapor_spec_vol_[count_T]); // assuming unit volume!
+  current_state.liquid = (1-D*vapor_spec_vol_[count_T]) / (liquid_spec_vol_[count_T]*(1+coeff_dissol_expan_*P/c_henry_[count_T]) - vapor_spec_vol_[count_T]);   // assuming unit volume
   current_state.vapor = D - current_state.liquid;
   current_state.n_pressure = P;
   current_state.liquid_density = (1+0.01*P/c_henry_[count_T]) / (liquid_spec_vol_[count_T]*(1+coeff_dissol_expan_*P/c_henry_[count_T]));
   current_state.percent_discharge = 0.0;
   
-  current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;     // F to K
-  current_state_si.pressure = current_state.pressure * 6894.76;                         // psi to Pa
-  current_state_si.discharge = current_state.discharge * 0.453592;                      // lb to kg
-  current_state_si.liquid = current_state.liquid * 0.453592;                            // lb to kg
-  current_state_si.vapor = current_state.vapor * 0.453592;                              // lb to kg
-  current_state_si.n_pressure = current_state.n_pressure * 6894.76;                     // psi to Pa
-  current_state_si.liquid_density = current_state.liquid_density * 16.0185;             // lb/(ft^3) to kg/(m^3)
-  current_state_si.percent_discharge = current_state.percent_discharge;                 // no need to convert for percentage
+  // initial tank state in SI units
+  current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;         // F to K
+  current_state_si.pressure = current_state.pressure * 6894.76;                             // psi to Pa
+  current_state_si.discharge = current_state.discharge * 0.453592;                          // lb to kg
+  current_state_si.liquid = current_state.liquid * 0.453592;                                // lb to kg
+  current_state_si.vapor = current_state.vapor * 0.453592;                                  // lb to kg
+  current_state_si.n_pressure = current_state.n_pressure * 6894.76;                         // psi to Pa
+  current_state_si.liquid_density = current_state.liquid_density * 16.0185;                 // lb/(ft^3) to kg/(m^3)
+  current_state_si.percent_discharge = current_state.percent_discharge;                     // no need to convert for percentage
   
   // Record the initial tank state
   Tank_state_en_.push_back(current_state);    
   Tank_state_si_.push_back(current_state_si);
+  
   count_T++;
+
 
 
   // Loop through all temperatures
   /**
    * Solve for the discharged weight and pressure at each temperature step through the conservations of mass, volume and entropy.
    */
+   
   for ( ; count_T < temperature_.size(); count_T++)
   {
-    double N, L1, L2, V2, P2, P3, E1, E5, E6, R1, R2, R3, A1, A2, A3; // intermediate variables
-    int count_iter = 1;    // count iterations
+    
+    double N, L1, L2, V2, P2, P3, E1, E5, E6, R1, R2, R3, A1, A2, A3;             // intermediate variables
+    int count_iter = 1;                                                           // count iterations
+    double P_inc = P_thres_/1.0;                                                  // pressure step increment when not converged
     
     N = current_state.liquid*0.01*current_state.n_pressure/c_henry_[count_T-1] + current_state.vapor*molecular_weight_ratio_*current_state.n_pressure/vapor_p_[count_T-1]; // weight of nitrogen in container
-    P2 = current_state.n_pressure;    // assumed new nitrogen pressure after discharge
+    P2 = current_state.n_pressure;        // assumed new nitrogen pressure after discharge
     P3 = P2 - 1;                          // random initialization for P3
     
     // Intermediate parameters
@@ -187,7 +199,7 @@ int williamson::tank (double P, double T, double D)
     A1 = R1*E1 - (1 + current_state.n_pressure/vapor_p_[count_T-1]) * vapor_entro_[count_T-1];
     
     // Converging pressure at one step
-    while ( std::abs(P3 - P2) > P_thres )           // loop if pressure difference is larger than threshold
+    while ( std::abs(P3 - P2) > P_thres_ )           // loop if pressure difference is still larger than threshold
     {
       E5 = (1 + coeff_dissol_expan_*P2/c_henry_[count_T]) * liquid_spec_vol_[count_T];
       R2 = (1 + 0.01*P2/c_henry_[count_T]) / E6;
@@ -195,30 +207,34 @@ int williamson::tank (double P, double T, double D)
       A2 = R2*E1 - (1 + coeff_dissol_expan_*P2/c_henry_[count_T]) * liquid_entro_[count_T];
       A3 = R3*E1 - (1 + P2/vapor_p_[count_T]) * vapor_entro_[count_T];
       
-      L2 = (current_state.vapor*A1*vapor_spec_vol_[count_T] - A3) / (A2*vapor_spec_vol_[count_T] - E5*A3);  // new liquid weight
-      V2 = (1 - L2*E5) / vapor_spec_vol_[count_T];                                                         // new vapor weight
-      L1 = current_state.liquid + current_state.vapor - L2 - V2;                                          // incremental liquid weight
+      L2 = (current_state.vapor*A1*vapor_spec_vol_[count_T] - A3) / (A2*vapor_spec_vol_[count_T] - E5*A3);    // new liquid weight
+      V2 = (1 - L2*E5) / vapor_spec_vol_[count_T];                                                            // new vapor weight
+      L1 = current_state.liquid + current_state.vapor - L2 - V2;                                              // incremental liquid weight
       P3 = (N - L1*0.01*current_state.n_pressure/c_henry_[count_T-1]) / (L2*0.01/c_henry_[count_T] + V2*molecular_weight_ratio_/vapor_p_[count_T]); // calculated new nitrogen pressure after discharge
       
       // print convergence info if verbose
       if (verbose)
       {
-        std::cout << "Iteration " << count_iter << " for temperature T=" << temperature_[count_T] << "(F): P2=" << P2 << "(psi), P3=" << P3 << "(psi)." << std::endl;
+        std::cout << "Tank iteration " << count_iter << " for temperature T=" << temperature_[count_T] << "(F): P2=" << P2 << "(psi), P3=" << P3 << "(psi)." << std::endl;
       }
     
       // Adapt P2 towards convergence
-      // if (P3 < (P2-P_thres*5)) P2 = P2 - P_thres*10;
-      // else if (P3 < (P2-P_thres)) P2 = P2 - P_thres;
-      if (P3 < (P2-P_thres))        P2 = P2 - P_thres;
-      else if (P3 > (P2+P_thres))   P2 = P2 + P_thres;
-      // else ; // do nothing
+      if ( P3 < ( P2 - P_thres_ ) )        P2 = P2 - P_inc;
+      else if ( P3 > ( P2 + P_thres_ ) )   P2 = P2 + P_inc;
+      
+      // If pressure drops to negative or too many iterations, result is not converging using current combination of threshold and increment.
+      if ( (P2 < 0) || (P3 < 0) || (count_iter > 2*P/P_inc) )
+      {
+        std::cout << "Tank state is not converging. Try again with a larger threshold, or maybe change increment size." << std::endl;
+        return 2;
+      }
       
       count_iter++;
     }
     
     
-    // std::cout << P2 << ' ' << P3 << std::endl;
-    // Update current container state
+    
+    // Update current container state in English units
     P2 = (P2 + P3)/2.0;                   // Use the average of P2 and P3 as the converged pressure
     current_state.temperature = temperature_[count_T];
     current_state.pressure = P2 + vapor_p_[count_T];
@@ -229,6 +245,7 @@ int williamson::tank (double P, double T, double D)
     current_state.liquid_density = (1+0.01*P2/c_henry_[count_T]) / (liquid_spec_vol_[count_T]*(1+coeff_dissol_expan_*P2/c_henry_[count_T]));
     current_state.percent_discharge = current_state.discharge / D;
     
+    // Update current container state in SI units
     current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;     // F to K
     current_state_si.pressure = current_state.pressure * 6894.76;                         // psi to Pa
     current_state_si.discharge = current_state.discharge * 0.453592;                      // lb to kg
@@ -238,6 +255,7 @@ int williamson::tank (double P, double T, double D)
     current_state_si.liquid_density = current_state.liquid_density * 16.0185;             // lb/(ft^3) to kg/(m^3)
     current_state_si.percent_discharge = current_state.percent_discharge;                 // no need to convert for percentage
     
+    
     // print converged current state to be saved if verbose
     if (verbose)
     {
@@ -245,8 +263,7 @@ int williamson::tank (double P, double T, double D)
     }
     
     // Make sure there is still liquid agent in container
-    // Tank_state_.push_back(current_state);
-    if (L2 >= 0.0)    // Still liquid left. Save the current state.
+    if (L2 >= 0.0)                                // Still liquid left. Save the current state.
     {
       Tank_state_en_.push_back(current_state);        // saved still in English units
       Tank_state_si_.push_back(current_state_si);     // save in si units
@@ -260,6 +277,7 @@ int williamson::tank (double P, double T, double D)
   }
 
 
+  std::cout << std::endl << "All temperatures in property file reached in tank state calculation." << std::endl << std::endl;
   return 0;
   
 }
@@ -280,26 +298,27 @@ int williamson::tank (double P, double T, double D)
 int williamson::pipe (double P, double T)
 {
   
-  // pressure convergence threshold (psi)
-  double P_thres = 0.02;
-  
   // Convert storage conditions from SI units to English units
-  P = P / 6894.76;                  // convert from Pa to psi
-  T = (T - 273.15)*(9/5.0) + 32;    // convert from kelvin to fahrenheit
+  P = P / 6894.76;                        // convert from Pa to psi
+  T = (T - 273.15)*(9/5.0) + 32;          // convert from kelvin to fahrenheit
+  
   
   
   // Temperature pre-processing
+  
   // If pipe starting temperature is outside the temperature range of data file, abort the program.
   // Allow a small error 0.001 to deal with float number comparison issue: slight difference but essentially equal.
   if ((T < (temperature_.back() - 0.001)) || (T > (temperature_.front() + 0.001)))
   {
     std::cout << "Pipe temperature is outside the available temperature data!" << std::endl;
-    abort();
+    return 1;
   }
+  
   
   // Do a temperature search. Find the block in data file that the pipe temperature belongs to.
   std::vector<double>::reverse_iterator T_iter = std::lower_bound (temperature_.rbegin(), temperature_.rend(), T);
   int count_T = temperature_.rend() - T_iter - 1;
+  
   
   // Linear interpolation only if temperature is in the middle of block. No need to interpolate if it's very close to boundaries.
   // Use 0.001 as the threshold for vicinity.
@@ -340,11 +359,13 @@ int williamson::pipe (double P, double T)
   // Otherwise it's close to the upper bound. Just use the property at current step and no need to do anything.
   
   
-  // Initialize the pipe state
-  pipe_state current_state,                                                                                 // define a current pipe state
-             current_state_si;
-  double N = 0.01*P/c_henry_[count_T];                                                                      // nitrogen weight does not change at each step
   
+  // Initialize the pipe state
+  pipe_state current_state,                                                                                 // define a current pipe state, in English units
+             current_state_si;                                                                              // current pipe state in SI units
+  double N = 0.01*P/c_henry_[count_T];                                                                      // nitrogen weight does not change at each step, which is different downstream position of the pipe
+  
+  // initial pipe state in English units
   current_state.temperature = temperature_[count_T];
   current_state.pressure = P + vapor_p_[count_T];
   current_state.liquid = 1;                                                                                 // expansion starts with unit mass of liquid agent and no vapor
@@ -352,6 +373,7 @@ int williamson::pipe (double P, double T)
   current_state.n_pressure = P;                                                                             // share tank nitrogen pressure at pipe beginning
   current_state.density = (1+N) / (liquid_spec_vol_[count_T]*(1+coeff_dissol_expan_*P/c_henry_[count_T]));  // initial density (only liquid exists)
   
+  // initial pipe state in SI units
   current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;     // F to K
   current_state_si.pressure = current_state.pressure * 6894.76;                         // psi to Pa
   current_state_si.liquid = current_state.liquid * 0.453592;                            // lb to kg
@@ -361,20 +383,25 @@ int williamson::pipe (double P, double T)
   
   // Record the initial pipe state
   Pipe_state_en_.push_back(current_state);  
-  Pipe_state_si_.push_back(current_state_si);                                                                   
+  Pipe_state_si_.push_back(current_state_si);
+  
   count_T++;
+  
   
   
   // Loop through all temperatures
   /**
    * Solve for the pressure and density at each temperature step through the conservations of mass and enthalpy.
    */
+  
   for ( ; count_T < temperature_.size(); count_T++)
   {
-    double L2, V2, P2, P3, E1, E2, E6, E7, E3, E4, E8, E9; // intermediate variables
-    int count_iter = 1;    // count iterations
     
-    P2 = current_state.n_pressure - 1;    // assumed new nitrogen pressure after discharge
+    double L2, V2, P2, P3, E1, E2, E6, E7, E3, E4, E8, E9;            // intermediate variables
+    int count_iter = 1;                                               // count iterations
+    double P_inc = P_thres_/2.5;                                      // pressure step increment when not converged
+    
+    P2 = current_state.n_pressure;        // assumed new nitrogen pressure after discharge
     P3 = P2 - 1;                          // random initialization for P3
   
     // Intermediate parameters
@@ -385,7 +412,7 @@ int williamson::pipe (double P, double T)
     
     
     // Converging pressure at one step
-    while ( std::abs(P3 - P2) > P_thres )           // loop if pressure difference is larger than threshold
+    while ( std::abs(P3 - P2) > P_thres_ )           // loop if pressure difference is larger than threshold
     {
       E3 = (1 + coeff_dissol_expan_*P2/c_henry_[count_T]) * liquid_enthal_[count_T];
       E4 = (1 + P2/vapor_p_[count_T]) * vapor_enthal_[count_T];
@@ -399,18 +426,26 @@ int williamson::pipe (double P, double T)
       // print convergence info if verbose
       if (verbose)
       {
-        std::cout << "Iteration " << count_iter << " for temperature T=" << temperature_[count_T] << "(F): P2=" << P2 << "(psi), P3=" << P3 << "(psi)." << std::endl;
+        std::cout << "Pipe iteration " << count_iter << " for temperature T=" << temperature_[count_T] << "(F): P2=" << P2 << "(psi), P3=" << P3 << "(psi)." << std::endl;
       }
     
       // Adapt P2 towards convergence
-      if (P3 < (P2-P_thres))        P2 = P2 - P_thres;
-      else if (P3 > (P2+P_thres))   P2 = P2 + P_thres;
+      if ( P3 < (P2 - P_thres_) )        P2 = P2 - P_inc;
+      else if ( P3 > (P2 + P_thres_) )   P2 = P2 + P_inc;
+      
+      // If pressure drops to negative or too many iterations, result is not converging using current combination of threshold and increment.
+      if ( (P2 < 0) || (P3 < 0) || (count_iter > 2*P/P_inc) )
+      {
+        std::cout << "Pipe state is not converging. Try again with a larger threshold, or maybe change increment size." << std::endl;
+        return 2;
+      }
       
       count_iter++;
     }
     
     
-    // Update current pipe state
+    
+    // Update current pipe state in English units
     P2 = (P2 + P3)/2.0;
     current_state.temperature = temperature_[count_T];
     current_state.pressure = P2 + vapor_p_[count_T];
@@ -419,6 +454,7 @@ int williamson::pipe (double P, double T)
     current_state.n_pressure = P2;
     current_state.density = (1+N) / (L2*liquid_spec_vol_[count_T]*(1+coeff_dissol_expan_*P2/c_henry_[count_T]) + V2*vapor_spec_vol_[count_T]);
     
+    // Update current pipe state in SI units
     current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;     // F to K
     current_state_si.pressure = current_state.pressure * 6894.76;                         // psi to Pa
     current_state_si.liquid = current_state.liquid * 0.453592;                            // lb to kg
@@ -433,8 +469,7 @@ int williamson::pipe (double P, double T)
     }
     
     // Make sure partial pressure of nitrogen is still positive in pipe
-    // Pipe_state_.push_back(current_state);
-    if (P2 >= 0.0)      // Still positive pressure. Store the current state.
+    if (P2 >= 0.0)          // Still positive pressure. Store the current state.
     {
       Pipe_state_en_.push_back(current_state);
       Pipe_state_si_.push_back(current_state_si);
@@ -448,6 +483,7 @@ int williamson::pipe (double P, double T)
   }
   
   
+  std::cout << std::endl << "All temperatures in property file reached in pipe state calculation." << std::endl << std::endl;
   return 0;
   
 }
@@ -456,6 +492,9 @@ int williamson::pipe (double P, double T)
 
 
 
+/**
+ * Loop through tank state discharge table (English units) and print each component in the vector.
+ */
 int williamson::print_tank_state_en()
 {
   
@@ -495,6 +534,9 @@ int williamson::print_tank_state_en()
 
 
 
+/**
+ * Loop through tank state discharge table (SI units) and print each component in the vector.
+ */
 int williamson::print_tank_state_si()
 {
   
@@ -534,6 +576,9 @@ int williamson::print_tank_state_si()
 
 
 
+/**
+ * Loop through pipe state expansion table (English units) and print each component in the vector.
+ */
 int williamson::print_pipe_state_en()
 {
   
@@ -568,6 +613,9 @@ int williamson::print_pipe_state_en()
 
 
 
+/**
+ * Loop through pipe state expansion table (SI units) and print each component in the vector.
+ */
 int williamson::print_pipe_state_si()
 {
   
@@ -602,6 +650,9 @@ int williamson::print_pipe_state_si()
 
 
 
+/**
+ * Loop through tank state discharge table (English units) and write each component in the vector to file.
+ */
 int williamson::write_tank_state_en(std::string container_discharge_file)
 {
   
@@ -628,6 +679,9 @@ int williamson::write_tank_state_en(std::string container_discharge_file)
 
 
 
+/**
+ * Loop through tank state discharge table (SI units) and write each component in the vector to file.
+ */
 int williamson::write_tank_state_si(std::string container_discharge_file)
 {
   
@@ -654,6 +708,9 @@ int williamson::write_tank_state_si(std::string container_discharge_file)
 
 
 
+/**
+ * Loop through pipe state expansion table (English units) and write each component in the vector to file.
+ */
 int williamson::write_pipe_state_en(std::string pipe_expansion_file)
 {
   
@@ -678,6 +735,9 @@ int williamson::write_pipe_state_en(std::string pipe_expansion_file)
 
 
 
+/**
+ * Loop through pipe state expansion table (SI units) and write each component in the vector to file.
+ */
 int williamson::write_pipe_state_si(std::string pipe_expansion_file)
 {
   
@@ -702,6 +762,10 @@ int williamson::write_pipe_state_si(std::string pipe_expansion_file)
 
 
 
+/**
+ * Interpolate at the given temperature according to tank state discharge table (English units).
+ * Temperature input in SI units (K).
+ */
 tank_state williamson::get_tank_state_from_T_en(double T)
 {
   
@@ -760,6 +824,10 @@ tank_state williamson::get_tank_state_from_T_en(double T)
 
 
 
+/**
+ * Interpolate at the given temperature according to tank state discharge table (SI units).
+ * Temperature input in SI units (K).
+ */
 tank_state williamson::get_tank_state_from_T_si(double T)
 {
   
@@ -816,6 +884,9 @@ tank_state williamson::get_tank_state_from_T_si(double T)
 
 
 
+/**
+ * Interpolate at the given discharge state according to tank state discharge table (English units).
+ */
 tank_state williamson::get_tank_state_from_percentdischarge_en(double percentdischarge)
 {
   
@@ -873,6 +944,9 @@ tank_state williamson::get_tank_state_from_percentdischarge_en(double percentdis
 
 
 
+/**
+ * Interpolate at the given discharge state according to tank state discharge table (SI units).
+ */
 tank_state williamson::get_tank_state_from_percentdischarge_si(double percentdischarge)
 {
   
@@ -930,6 +1004,10 @@ tank_state williamson::get_tank_state_from_percentdischarge_si(double percentdis
 
 
 
+/**
+ * Interpolate at the given temperature according to pipe state expansion table (English units).
+ * Temperature input in SI units (K).
+ */
 pipe_state williamson::get_pipe_state_en(double T)
 {
   
@@ -986,6 +1064,10 @@ pipe_state williamson::get_pipe_state_en(double T)
 
 
 
+/**
+ * Interpolate at the given temperature according to pipe state expansion table (SI units).
+ * Temperature input in SI units (K).
+ */
 pipe_state williamson::get_pipe_state_si(double T)
 {
   
@@ -1046,6 +1128,10 @@ pipe_state williamson::get_pipe_state_si(double T)
 // Several stand along functions
 // *******************************************************
 
+
+/**
+ * The tank state needs to be given in English units.
+ */
 void print_one_tank_state_en(tank_state quote_state)
 {
   
@@ -1078,6 +1164,9 @@ void print_one_tank_state_en(tank_state quote_state)
   
 
 
+/**
+ * The tank state needs to be given in SI units.
+ */
 void print_one_tank_state_si(tank_state quote_state)
 {
   
@@ -1110,6 +1199,9 @@ void print_one_tank_state_si(tank_state quote_state)
 
 
 
+/**
+ * The pipe state needs to be given in English units.
+ */
 void print_one_pipe_state_en(pipe_state quote_state)
 {
   
@@ -1138,6 +1230,9 @@ void print_one_pipe_state_en(pipe_state quote_state)
   
 
 
+/**
+ * The pipe state needs to be given in SI units.
+ */
 void print_one_pipe_state_si(pipe_state quote_state)
 {
   

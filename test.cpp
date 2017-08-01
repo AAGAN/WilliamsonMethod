@@ -7,10 +7,13 @@
 
 
 //! Define the problem and call Williamson Method
+
 /** 
 Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units.
 Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first.
 Pipe expansion state is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first.
+
+Program would also terminate if not converging. Prompting user to try other combinations of pressure convergence threshold and increment.
 */
 
 
@@ -22,9 +25,10 @@ int main()
   // ************************************************************
   
   // Use property data file "Halon1301_property.csv" for Halon 1301
-  std::string property_file_name = "Halon1301_property.csv";
+  // std::string property_file_name = "Halon1301_property.csv";
+  
   // Use property data file "Novec1230_property.csv" for Novec 1230
-  // std::string property_file_name = "Novec1230_property.csv";
+  std::string property_file_name = "Novec1230_property.csv";
         
         
 
@@ -35,12 +39,14 @@ int main()
   double molecular_weight_ratio,      // molecular weight ratio of inert gas vs agent
          coeff_dissol_expan;          // effect of dissolved inert gas on the liquid volume
   
+  
   // Halon
-  molecular_weight_ratio = 0.188;
-  coeff_dissol_expan = 0.053;
+  // molecular_weight_ratio = 0.188;
+  // coeff_dissol_expan = 0.053;
+  
   // Novec
-  // molecular_weight_ratio = 0.088636;
-  // coeff_dissol_expan = 0.0429;
+  molecular_weight_ratio = 0.088636;
+  coeff_dissol_expan = 0.0429;
         
   
   
@@ -49,20 +55,22 @@ int main()
   // ************************************************************
   
   // Halon
-  double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
-  double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
+  // double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
+  // double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  // double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
+  
   // Novec
-  // double P = 1001 * 6894.76;                    // Partial pressure of nitrogen (Pa)
-  // double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  // double D = 700;                              // Filling density of storage container (kg/(m^3))
+  double P = 1001 * 6894.76;                    // Partial pressure of nitrogen (Pa)
+  double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  double D = 700;                              // Filling density of storage container (kg/(m^3))
 
   
   
   // ************************************************************
   //! Variables to store tank state and pipe state
   // ************************************************************
-  /*
+  
+  /**
   // Structure for the state of tank during discharge.
   struct tank_state
   {
@@ -88,6 +96,7 @@ int main()
   };
   */
 
+  // State containers, for test here.
   std::vector<tank_state> Tank_state;
   tank_state tank_state_snap;
   std::vector<pipe_state> Pipe_state;
@@ -97,19 +106,18 @@ int main()
   
   // ************************************************************
   //! Create an instance of williamson class
+  //  Refer to williamson.hpp for all available class methods
   // ************************************************************
-  // Refer to williamson.hpp for all available class methods
   
   williamson test_case(property_file_name, molecular_weight_ratio, coeff_dissol_expan);
   
   
-  // ************************************************************
-  // Turn on verbose for more information when running
-  // ************************************************************
+  // Turn on verbose for more information is desired when running
   test_case.verbose_on();
   
   
-  // test_case.set_pressure_threshold(0.05);
+  // Set pressure threshold to a desired value
+  test_case.set_pressure_threshold(0.3);
   
   
   
@@ -125,7 +133,7 @@ int main()
     T, 
     D
   );
-  // Tank_state_ has been updated after running williamson
+  // Tank state in test_case has been updated after running williamson
 
   
   // If tank calculation succeeds
@@ -138,8 +146,8 @@ int main()
     
     // Write to file
     std::string container_discharge_file;                             // The file to hold container state during discharge
-    container_discharge_file = "Halon1301_container_discharge.csv";
-    // container_discharge_file = "Novec1230_container_discharge.csv";
+    // container_discharge_file = "Halon1301_container_discharge.csv";
+    container_discharge_file = "Novec1230_container_discharge.csv";
     test_case.write_tank_state_en(container_discharge_file);
     // test_case.write_tank_state_si(container_discharge_file);
     
@@ -152,14 +160,14 @@ int main()
     // Access and print the tank state structure at the given temperature or percentage of discharge
     // tank_state_snap = test_case.get_tank_state_from_T_en(T);
     tank_state_snap = test_case.get_tank_state_from_percentdischarge_si(0.5);
-    print_one_tank_state_en(tank_state_snap);
+    print_one_tank_state_si(tank_state_snap);
     // tank_state_snap = test_case.get_tank_state_from_T_si(T);
     // print_tank_state_si(tank_state_snap);
   }
   
   else
   {
-    std::cout << "williamson code part 1 exited with code " << error_code_1 << std::endl;
+    std::cout << "williamson code tank part exited with code " << error_code_1 << std::endl;
   }
   
   
@@ -170,7 +178,11 @@ int main()
   //! Solve for pipe state at a given discharging snapshot
   // ************************************************************
   
-  // int tank_line = 16;                        // Choose the line number in the tank state table as the starting pipe condition
+  // Turn off verbose when not wanting information to overflow
+  test_case.verbose_off();
+  
+  
+  // int tank_line = 16;                        // Choose the line number in the tank state table as the starting pipe condition. Use for testing.
   int error_code_2 = test_case.pipe
   (
     tank_state_snap.n_pressure,
@@ -190,8 +202,8 @@ int main()
               
     // Write to file
     std::string pipe_expansion_file;                             // The file to hold pipe state during expansion
-    pipe_expansion_file = "Halon1301_pipe_expansion.csv";
-    // pipe_expansion_file = "Novec1230_pipe_expansion.csv";
+    // pipe_expansion_file = "Halon1301_pipe_expansion.csv";
+    pipe_expansion_file = "Novec1230_pipe_expansion.csv";
     test_case.write_pipe_state_en(pipe_expansion_file);
     // test_case.write_pipe_state_si(pipe_expansion_file);
     
@@ -211,10 +223,11 @@ int main()
   
   else
   {
-    std::cout << "williamson code part 2 exited with code " << error_code_2 << std::endl;
+    std::cout << "williamson code pipe part exited with code " << error_code_2 << std::endl;
   }
   
   
   
   return 0;
 }
+

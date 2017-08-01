@@ -4,7 +4,9 @@
 
 
 // brief description
+// ************************************************************
 //! The agent class stores and accesses relevant physical properties of a specific agent, with respect to a certain inert gas.
+// ************************************************************
 
 // detailed description
 /** 
@@ -33,15 +35,15 @@ class agent
         
         
         // accessor functions
-        std::vector<double> get_temperature() const {return temperature_;}              //!< access temperature vector (F)
-        std::vector<double> get_vapor_p() const {return vapor_p_;}                      //!< access agent vapor pressure vector (PSI)
-        std::vector<double> get_liquid_spec_vol() const {return liquid_spec_vol_;}      //!< access liquid specific volume vector (cubic foot/pound)
-        std::vector<double> get_vapor_spec_vol() const {return vapor_spec_vol_;}        //!< access vapor specific volume vector (cubic foot/pound)
-        std::vector<double> get_liquid_enthal() const {return liquid_enthal_;}          //!< access liquid enthalpy vector (btu/pound)
-        std::vector<double> get_vapor_enthal() const {return vapor_enthal_;}            //!< access vapor enthalpy vector (btu/pound)
-        std::vector<double> get_liquid_entro() const {return liquid_entro_;}            //!< access liquid entropy vector (btu/pound/rankine)
-        std::vector<double> get_vapor_entro() const {return vapor_entro_;}              //!< access vapor entropy vector (btu/pound/rankine)
-        std::vector<double> get_c_henry() const {return c_henry_;}                      //!< access henry's law constant vector (psi/weight percent)
+        std::vector<double> get_temperature() const {return temperature_;}                              //!< access temperature vector (F)
+        std::vector<double> get_vapor_p() const {return vapor_p_;}                                      //!< access agent vapor pressure vector (PSI)
+        std::vector<double> get_liquid_spec_vol() const {return liquid_spec_vol_;}                      //!< access liquid specific volume vector (cubic foot/pound)
+        std::vector<double> get_vapor_spec_vol() const {return vapor_spec_vol_;}                        //!< access vapor specific volume vector (cubic foot/pound)
+        std::vector<double> get_liquid_enthal() const {return liquid_enthal_;}                          //!< access liquid enthalpy vector (btu/pound)
+        std::vector<double> get_vapor_enthal() const {return vapor_enthal_;}                            //!< access vapor enthalpy vector (btu/pound)
+        std::vector<double> get_liquid_entro() const {return liquid_entro_;}                            //!< access liquid entropy vector (btu/pound/rankine)
+        std::vector<double> get_vapor_entro() const {return vapor_entro_;}                              //!< access vapor entropy vector (btu/pound/rankine)
+        std::vector<double> get_c_henry() const {return c_henry_;}                                      //!< access henry's law constant vector (psi/weight percent)
         
         double              get_molecular_weight_ratio() const {return molecular_weight_ratio_;}        //!< access molecular weight ratio of inert gas vs agent
         double              get_coeff_dissol_expan() const {return coeff_dissol_expan_;}                //!< access coefficient of liquid volume expansion
@@ -50,17 +52,17 @@ class agent
     private:
     
         // agent property parameters
-        std::vector<double> temperature_,               //!< temperature (F)
-                            vapor_p_,                   //!< agent vapor pressure (PSI)
-                            liquid_spec_vol_,           //!< liquid specific volume (cubic foot/pound)
-                            vapor_spec_vol_,            //!< vapor specific volume (cubic foot/pound)
-                            liquid_enthal_,             //!< liquid enthalpy (btu/pound)
-                            vapor_enthal_,              //!< vapor enthalpy (btu/pound)
-                            liquid_entro_,              //!< liquid entropy (btu/pound/rankine)
-                            vapor_entro_,               //!< vapor entropy (btu/pound/rankine)
-                            c_henry_;                   //!< henry's law constant (psi/weight percent)
+        std::vector<double> temperature_,                                                               //!< temperature (F)
+                            vapor_p_,                                                                   //!< agent vapor pressure (PSI)
+                            liquid_spec_vol_,                                                           //!< liquid specific volume (cubic foot/pound)
+                            vapor_spec_vol_,                                                            //!< vapor specific volume (cubic foot/pound)
+                            liquid_enthal_,                                                             //!< liquid enthalpy (btu/pound)
+                            vapor_enthal_,                                                              //!< vapor enthalpy (btu/pound)
+                            liquid_entro_,                                                              //!< liquid entropy (btu/pound/rankine)
+                            vapor_entro_,                                                               //!< vapor entropy (btu/pound/rankine)
+                            c_henry_;                                                                   //!< henry's law constant (psi/weight percent)
         
-        double              molecular_weight_ratio_,    //!< molecular weight ratio of inert gas vs agent
-                            coeff_dissol_expan_;        //!< coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume
+        double              molecular_weight_ratio_,                                                    //!< molecular weight ratio of inert gas vs agent
+                            coeff_dissol_expan_;                                                        //!< coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume
     
 };
