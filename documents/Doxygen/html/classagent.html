@@ -107,7 +107,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a97e4591f9605061a296454cf989fa1c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">access temperature vector (F)  <a href="#a97e4591f9605061a296454cf989fa1c6">More...</a><br /></td></tr>
 <tr class="separator:a97e4591f9605061a296454cf989fa1c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a011faa04a47f2db87635f481eb29c8b8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classagent.html#a011faa04a47f2db87635f481eb29c8b8">get_vapor_p</a> () const</td></tr>
-<tr class="memdesc:a011faa04a47f2db87635f481eb29c8b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">access agent vapor pressure vector (PSI)  <a href="#a011faa04a47f2db87635f481eb29c8b8">More...</a><br /></td></tr>
+<tr class="memdesc:a011faa04a47f2db87635f481eb29c8b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">access agent vapor pressure vector (psi)  <a href="#a011faa04a47f2db87635f481eb29c8b8">More...</a><br /></td></tr>
 <tr class="separator:a011faa04a47f2db87635f481eb29c8b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f6d634d923d522df8a6a7be9c7e46d3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classagent.html#a3f6d634d923d522df8a6a7be9c7e46d3">get_liquid_spec_vol</a> () const</td></tr>
 <tr class="memdesc:a3f6d634d923d522df8a6a7be9c7e46d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">access liquid specific volume vector (cubic foot/pound)  <a href="#a3f6d634d923d522df8a6a7be9c7e46d3">More...</a><br /></td></tr>
@@ -141,10 +141,11 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>The agent class stores and accesses relevant physical properties of a specific agent, with respect to a certain inert gas. </p>
 <p>It contains constructors, destructor and accessors for private members.</p>
 <p>The constructor takes as parameters an agent property file name and two float numbers.</p>
-<p>The property file should be in such a format that each row starts with a temperature and contains 8 property values at that temperature, separated by commas. All rows should be sorted in a temperature-ascending order. After reading the property file line by line and inserting into front of vectors, all private member vectors are in a temperature-descending order. All numbers should be in English units. The 8 properties following temperature (F) are correspondingly: agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), and henry's law constant (psi/weight percent).</p>
+<p>After reading the property file line by line and inserting into front of vectors, all private member vectors are in a temperature-descending order.</p>
+<p>All numbers should be in English units. The 8 properties following temperature (F) are correspondingly: agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), and henry's law constant (psi/weight percent).</p>
 <p>The two inputs after file name are the molecular weight ratio of inert gas vs agent and the coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume. </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00023">23</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00024">24</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="af5eb66189d689e9d7b5642ebda2c8fbc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af5eb66189d689e9d7b5642ebda2c8fbc">&#9670;&nbsp;</a></span>agent() <span class="overload">[1/2]</span></h2>
@@ -184,7 +185,7 @@ Public Member Functions</h2></td></tr>
 
 <p>class destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8cpp_source.html#l00032">32</a> of file <a class="el" href="agent_8cpp_source.html">agent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8cpp_source.html#l00022">22</a> of file <a class="el" href="agent_8cpp_source.html">agent.cpp</a>.</p>
 
 </div>
 </div>
@@ -229,9 +230,10 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Agent class constructor based on agent property file name, molecular weight ratio and coefficient of liquid volume expansion. </p>
-<p>No longer use agent indicator. Agent is specified through the properties. Instead of pushing back, use insert to the front since temperature data in file is in an ascending order. If the data file is in a temperature descent order then need to note and push_back into vectors when reading in inside <a class="el" href="agent_8cpp.html">agent.cpp</a>. After insertion these vectors hold properties in a temperature-descending order. </p>
+<p>No longer use agent indicator. Agent is specified through the properties.</p>
+<p>Instead of pushing back, use insert to the front since temperature data in file is in an ascending order and we want them saved now reversely. If the data file is in a temperature descent order then need to note and push_back into vectors when reading in inside <a class="el" href="agent_8cpp.html">agent.cpp</a>. After insertion these vectors hold properties in a temperature-descending order. </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8cpp_source.html#l00046">46</a> of file <a class="el" href="agent_8cpp_source.html">agent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8cpp_source.html#l00037">37</a> of file <a class="el" href="agent_8cpp_source.html">agent.cpp</a>.</p>
 
 </div>
 </div>
@@ -261,7 +263,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access henry's law constant vector (psi/weight percent) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00044">44</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00045">45</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +292,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access coefficient of liquid volume expansion </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00047">47</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00048">48</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -319,7 +321,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access liquid enthalpy vector (btu/pound) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00040">40</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00041">41</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -348,7 +350,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access liquid entropy vector (btu/pound/rankine) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00042">42</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00043">43</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -377,7 +379,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access liquid specific volume vector (cubic foot/pound) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00038">38</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00039">39</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +408,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access molecular weight ratio of inert gas vs agent </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00046">46</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00047">47</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -435,7 +437,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access temperature vector (F) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00036">36</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00037">37</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -464,7 +466,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access vapor enthalpy vector (btu/pound) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00041">41</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00042">42</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -493,7 +495,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access vapor entropy vector (btu/pound/rankine) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00043">43</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00044">44</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -520,9 +522,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>access agent vapor pressure vector (PSI) </p>
+<p>access agent vapor pressure vector (psi) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00037">37</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00038">38</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>
@@ -551,7 +553,7 @@ Public Member Functions</h2></td></tr>
 
 <p>access vapor specific volume vector (cubic foot/pound) </p>
 
-<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00039">39</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="agent_8hpp_source.html#l00040">40</a> of file <a class="el" href="agent_8hpp_source.html">agent.hpp</a>.</p>
 
 </div>
 </div>

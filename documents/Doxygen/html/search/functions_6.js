@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['_7eagent',['~agent',['../classagent.html#a73d9031631414177ec4d75d05f1efb4c',1,'agent']]],
-  ['_7ewilliamson',['~williamson',['../classwilliamson.html#a264dc8aef64c7d8e30d3bb3ba829838a',1,'williamson']]]
+  ['verbose_5foff',['verbose_off',['../classwilliamson.html#ac203899eecfc8ba42308ea56facc3896',1,'williamson']]],
+  ['verbose_5fon',['verbose_on',['../classwilliamson.html#aae62e0f070810dd9278fc05c6cc6f7ea',1,'williamson']]]
 ];

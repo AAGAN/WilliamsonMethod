@@ -1,4 +1,4 @@
-#### Williamson Method
+# Williamson Method
 
 Based on the 1985 paper "Calculating H-1301 discharge pressures and densities" by H.V.Williamson, this theory calculates the container and pipe states during the instantaneous discharge of super-pressurized fire extinguishing agent (liquid) propelled by inert gas (N2).
 
@@ -16,7 +16,7 @@ This code is capable to generalize to other futuristic agents or inert gases, an
 
 
 
-# Limitations:
+#### Limitations:
 
 * Container state calculation is valid until the point when all liquid agent has been discharged and the pipeline begins to fill with vapor.
 The theory is applicable to the whole pipeline calculation only starting from when the firstly discharged agent reach the nozzle and the whole pipe is filled with agent. Before that point pipe state can still be calculated for the part that's reached by discharged agent, but this is due to not considering the hydraulics.
@@ -30,7 +30,7 @@ Isenthalpy (constant enthalpy) for pipeline means no energy in the form of work 
 
 
 
-## C++ implementation of Williamson's method and How to use it
+### C++ implementation of Williamson's method and How to use it
 
 * STEP 1:
 Type "g++ agent.cpp williamson.cpp test.cpp" to generate an executable that runs the program.
@@ -67,7 +67,7 @@ Williamson Method exit code:
 
 
 
-## Property file:
+### Property file:
 
 Each agent is read in from its specific file, which has to obey the following format:
 
@@ -91,7 +91,7 @@ Verification cases simply using constant values (3400 and 3600) for Henry's Law 
 
 
 
-## Core algorithm for the theory - Pressure convergence criterion:
+### Core algorithm for the theory - Pressure convergence criterion:
 
 In solving for the tank or pipe state at a temperature, a pressure value is firstly guessed. After plugging this value into those coupled equations the resultant pressure should be the same as the assumed pressure.
 If they are not equal (not converged), adjusting the assuming pressure until convergence.
@@ -125,7 +125,7 @@ Other than the convergence criterion, the pressure increment (P_inc), which is t
 
 
 
-## Caveats:
+### Caveats:
 
 * Molecular weight ratio (N2/agent) is 0.188 in paper but that's just for Halon. It really needs to be changed depending on the agent.
 
@@ -148,7 +148,7 @@ It is therefore important for the user to test various criteria and eventually u
 
 
 
-## Miscellaneous:
+### Miscellaneous:
 
 The calculated pressure recession matches Figure H.1(b) of NFPA 12A for Halon 1301.
 The slight difference could be due to many reasons:
@@ -160,7 +160,7 @@ The slight difference could be due to many reasons:
 
 
 
-## Developing notes:
+### Developing notes:
 
 * Agent class defined, but users don't really need to interact with the agent class.
 In fact the agent class might be unnecessary. The agent constructor can just be implemented in the williamson constructor.

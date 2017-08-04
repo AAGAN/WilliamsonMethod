@@ -86,7 +86,6 @@ $(document).ready(function(){initNavTree('test_8cpp.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="williamson_8hpp_source.html">williamson.hpp</a>&quot;</code><br />
-<code>#include &lt;assert.h&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
@@ -96,7 +95,7 @@ $(document).ready(function(){initNavTree('test_8cpp.html','');});
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a> ()</td></tr>
-<tr class="memdesc:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the problem and call Williamson Method.  <a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">More...</a><br /></td></tr>
+<tr class="memdesc:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the container-pipe system and call Williamson Method.  <a href="#ae66f6b31b5ad750f1fe042a706a4e3d4">More...</a><br /></td></tr>
 <tr class="separator:ae66f6b31b5ad750f1fe042a706a4e3d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -115,15 +114,13 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Define the problem and call Williamson Method. </p>
-<p>Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units. Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first. Pipe expansion state is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first. </p>
-<p>read in agent property data from files</p>
-<p>Set molecular weight ratio and coefficient of dissolved volume expansion according to agent</p>
-<p>Initial storage conditions</p>
-<p>Solve for tank state</p>
-<p>Solve for pipe state at a given discharging snapshot </p>
+<p>Define the container-pipe system and call Williamson Method. </p>
+<p>Define agent property file in English units and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units.</p>
+<p>Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first.</p>
+<p>Pipe expansion state calculation is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first.</p>
+<p>Program would also terminate if not converging. Prompting user to try other (usually higher) pressure convergence criterion. </p>
 
-<p class="definition">Definition at line <a class="el" href="test_8cpp_source.html#l00016">16</a> of file <a class="el" href="test_8cpp_source.html">test.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test_8cpp_source.html#l00021">21</a> of file <a class="el" href="test_8cpp_source.html">test.cpp</a>.</p>
 
 </div>
 </div>
