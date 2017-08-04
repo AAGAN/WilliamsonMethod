@@ -6,24 +6,14 @@
 #include <stdlib.h>     // atof or strtof
 
 // using namespace std;
-// Remember to add the namespace std:: after commenting this out !!
+// Remember to add the namespace std:: after commenting this out!
 
 
 
 //! class default constructor
 agent::agent()
 {
-    // temperature_.push_back(0.0);
-    // vapor_p_.push_back(0.0);
-    // liquid_spec_vol_.push_back(0.0);
-    // vapor_spec_vol_.push_back(0.0);
-    // liquid_enthal_.push_back(0.0);
-    // vapor_enthal_.push_back(0.0);
-    // liquid_entro_.push_back(0.0);
-    // vapor_entro_.push_back(0.0);
-    // c_henry_.push_back(0.0);
-    // molecular_weight_ratio_ = 0.0;
-    // coeff_dissol_expan_ = 0.0;
+    
 }
 
 
@@ -39,7 +29,8 @@ agent::~agent()
 // Agent class constructor
 /** 
  * No longer use agent indicator. Agent is specified through the properties.
- * Instead of pushing back, use insert to the front since temperature data in file is in an ascending order.
+ * 
+ * Instead of pushing back, use insert to the front since temperature data in file is in an ascending order and we want them saved now reversely.
  * If the data file is in a temperature descent order then need to note and push_back into vectors when reading in inside agent.cpp.
  * After insertion these vectors hold properties in a temperature-descending order.
  */
@@ -60,7 +51,7 @@ agent::agent(std::string property_file_name, double molecular_weight_ratio, doub
     {
         std::cout << "Error with the file! Nonexistent, empty, or else." << std::endl;
         abort();
-        // exit (EXIT_FAILURE);
+        // exit (EXIT_FAILURE);                                 // another way of aborting
     }
         
         
@@ -81,28 +72,21 @@ agent::agent(std::string property_file_name, double molecular_weight_ratio, doub
         // temperature_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         vapor_p_.insert(vapor_p_.begin(), atof(one_number.c_str()));
-        // vapor_p_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         liquid_spec_vol_.insert(liquid_spec_vol_.begin(), atof(one_number.c_str()));
-        // liquid_spec_vol_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         vapor_spec_vol_.insert(vapor_spec_vol_.begin(), atof(one_number.c_str()));
-        // vapor_spec_vol_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         liquid_enthal_.insert(liquid_enthal_.begin(), atof(one_number.c_str()));
-        // liquid_enthal_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         vapor_enthal_.insert(vapor_enthal_.begin(), atof(one_number.c_str()));
-        // vapor_enthal_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         liquid_entro_.insert(liquid_entro_.begin(), atof(one_number.c_str()));
-        // liquid_entro_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         vapor_entro_.insert(vapor_entro_.begin(), atof(one_number.c_str()));
-        // vapor_entro_.push_back(atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         c_henry_.insert(c_henry_.begin(), atof(one_number.c_str()));
-        // c_henry_.push_back(atof(one_number.c_str()));
+        
         // The linear relation between Henry's constant and temperature for Novec is already appended in its data file.
         // c_henry_.insert(c_henry_.begin(), 0.9286*temperature_.front() + 3494.6);
         // c_henry_.insert(c_henry_.begin(), 3600);

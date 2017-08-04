@@ -7,14 +7,14 @@
 //! A structure for the state of tank during discharge.
 struct tank_state
 {
-  double temperature;         //!< container temperature
-  double pressure;            //!< container pressure
-  double discharge;           //!< discharged liquid mass
-  double liquid;              //!< liquid mass in container
-  double vapor;               //!< vapor mass in container
-  double n_pressure;          //!< partial pressure of inert gas (N2)
-  double liquid_density;      //!< density of liquid mixture (with inert gas solute)
-  double percent_discharge;   //!< percentage of discharged agent: mass of discharged agent over initial filled agent
+  double temperature;                   //!< container temperature
+  double pressure;                      //!< container pressure
+  double discharge;                     //!< discharged liquid mass
+  double liquid;                        //!< liquid mass in container
+  double vapor;                         //!< vapor mass in container
+  double n_pressure;                    //!< partial pressure of inert gas (N2)
+  double liquid_density;                //!< density of liquid mixture (with inert gas solute)
+  double percent_discharge;             //!< percentage of discharged agent: mass of discharged agent over initial filled agent
 };
 
 
@@ -22,12 +22,12 @@ struct tank_state
 //! A structure for the state of the pipe.
 struct pipe_state
 {
-  double temperature;         //!< pipe temperature
-  double pressure;            //!< pipe pressure
-  double liquid;              //!< liquid agent mass in pipe
-  double vapor;               //!< vapor agent mass in pipe
-  double n_pressure;          //!< partial pressure of inert gas (N2) in pipe
-  double density;             //!< total density of mixture (agent + inert gas) of liquid and vapor together
+  double temperature;                   //!< pipe temperature
+  double pressure;                      //!< pipe pressure
+  double liquid;                        //!< liquid agent mass in pipe
+  double vapor;                         //!< vapor agent mass in pipe
+  double n_pressure;                    //!< partial pressure of inert gas (N2) in pipe
+  double density;                       //!< total density of mixture (agent + inert gas) of liquid and vapor together
 };
 
 
@@ -35,7 +35,9 @@ struct pipe_state
 
 
 // brief description
+// ************************************************************
 //! A class as an API for the Williamson method.
+// ************************************************************
 
 // detailed description
 /** 
@@ -102,16 +104,16 @@ class williamson
         int write_pipe_state_si(std::string);
         
         //! Access the tank state vector in English units
-        std::vector<tank_state> get_tank_state_en() const {return Tank_state_en_;}
+        std::vector<tank_state> get_tank_state_en() const   {return Tank_state_en_;}
         
         //! Access the tank state vector in SI units
-        std::vector<tank_state> get_tank_state_si() const {return Tank_state_si_;}
+        std::vector<tank_state> get_tank_state_si() const   {return Tank_state_si_;}
         
         //! Access the pipe state vector in English units
-        std::vector<pipe_state> get_pipe_state_en() const {return Pipe_state_en_;}
+        std::vector<pipe_state> get_pipe_state_en() const   {return Pipe_state_en_;}
         
         //! Access the pipe state vector in SI units
-        std::vector<pipe_state> get_pipe_state_si() const {return Pipe_state_si_;}
+        std::vector<pipe_state> get_pipe_state_si() const   {return Pipe_state_si_;}
         
         //! Access the tank state in English units at a given temperature (K)
         tank_state get_tank_state_from_T_en(double);
@@ -131,40 +133,48 @@ class williamson
         //! Access the pipe state in SI units at a given temperature (K)
         pipe_state get_pipe_state_si(double);
         
-        //! Methods to let the user turn on/off the verbose flag.
-        void verbose_on()           {verbose = true;}
-        void verbose_off()          {verbose = false;}
+        //! Set pressure threshold to the assigned value
+        void set_pressure_threshold(double P_thres)         {P_thres_ = P_thres;}
+        
+        //! Method to let the user turn on the verbose flag
+        void verbose_on()                                   {verbose = true;}
+        
+        //! Method to let the user turn off the verbose flag
+        void verbose_off()                                  {verbose = false;}
 
   
     private:
     
-        bool verbose;                                   // A boolean flag. Default false. Turn on to print running details and messages.
+        bool verbose;                                           // A boolean flag. Default false. Turn on to print running details and messages.
     
-        std::vector<tank_state> Tank_state_en_,         // The vector that holds tank state at all temperatures, in English units
-                                Tank_state_si_;         // in SI units
-        std::vector<pipe_state> Pipe_state_en_,         // The vector that holds pipe state at all temperatures, in English units
-                                Pipe_state_si_;         // in SI units
+        std::vector<tank_state> Tank_state_en_,                 // The vector that holds tank state at all temperatures, in English units
+                                Tank_state_si_;                 // in SI units
+        std::vector<pipe_state> Pipe_state_en_,                 // The vector that holds pipe state at all temperatures, in English units
+                                Pipe_state_si_;                 // in SI units
         
-        std::vector<double> temperature_,               // temperature (F)
-                            vapor_p_,                   // agent vapor pressure (PSI)
-                            liquid_spec_vol_,           // liquid specific volume (cubic foot/pound)
-                            vapor_spec_vol_,            // vapor specific volume (cubic foot/pound)
-                            liquid_enthal_,             // liquid enthalpy (btu/pound)
-                            vapor_enthal_,              // vapor enthalpy (btu/pound)
-                            liquid_entro_,              // liquid entropy (btu/pound/rankine)
-                            vapor_entro_,               // vapor entropy (btu/pound/rankine)
-                            c_henry_;                   // henry's law constant (psi/weight percent)
+        std::vector<double> temperature_,                       // temperature (F)
+                            vapor_p_,                           // agent vapor pressure (PSI)
+                            liquid_spec_vol_,                   // liquid specific volume (cubic foot/pound)
+                            vapor_spec_vol_,                    // vapor specific volume (cubic foot/pound)
+                            liquid_enthal_,                     // liquid enthalpy (btu/pound)
+                            vapor_enthal_,                      // vapor enthalpy (btu/pound)
+                            liquid_entro_,                      // liquid entropy (btu/pound/rankine)
+                            vapor_entro_,                       // vapor entropy (btu/pound/rankine)
+                            c_henry_;                           // henry's law constant (psi/weight percent)
         
-        double              molecular_weight_ratio_,    // molecular weight ratio of inert gas vs agent
-                            coeff_dissol_expan_;        // coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume
+        double              molecular_weight_ratio_,            // molecular weight ratio of inert gas vs agent
+                            coeff_dissol_expan_;                // coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume
+                            
+        double              P_thres_;                           // pressure convergence threshold (psi)
   
 };
 
 
 
 
-//! Stand along functions: print a state structure
-/** The state should be passed into the print function with corresponding units. User is responsible to guarantee this. */
+
+// Stand along functions: print a state structure
+
         
 //! Print the given tank state in English units to screen
 void print_one_tank_state_en(tank_state);

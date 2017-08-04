@@ -1,7 +1,7 @@
 var NAVTREE =
 [
   [ "Williamson Method for Clean Agent Discharge", "index.html", [
-    [ "WilliamsonMethod", "md__c_1__users_darenliu__documents__git_hub__williamson_method__r_e_a_d_m_e.html", null ],
+    [ "Williamson Method", "md__c_1__users_darenliu__documents__git_hub__williamson_method__r_e_a_d_m_e.html", null ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
