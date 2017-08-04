@@ -29,7 +29,8 @@ agent::~agent()
 // Agent class constructor
 /** 
  * No longer use agent indicator. Agent is specified through the properties.
- * Instead of pushing back, use insert to the front since temperature data in file is in an ascending order.
+ * 
+ * Instead of pushing back, use insert to the front since temperature data in file is in an ascending order and we want them saved now reversely.
  * If the data file is in a temperature descent order then need to note and push_back into vectors when reading in inside agent.cpp.
  * After insertion these vectors hold properties in a temperature-descending order.
  */

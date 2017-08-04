@@ -1,76 +1,103 @@
 #include "williamson.hpp"
-#include <assert.h>       // assert function helps debugging
+// #include <assert.h>       // assert function helps debugging
 #include <iostream>
 #include <fstream>
 #include <vector>
 
 
 
-//! Define the problem and call Williamson Method
+//! Define the container-pipe system and call Williamson Method
 
 /** 
-Define agent file and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units.
+Define agent property file in English units and initial storage conditions (filling density, temperature, nitrogen partial temperature) in SI units.
+
 Container state during discharge is run until the point when liquid is depleted or reaching the lowest temperature available in data, whichever comes first.
-Pipe expansion state is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first.
 
-Program would also terminate if not converging. Prompting user to try other combinations of pressure convergence threshold and increment.
+Pipe expansion state calculation is run until the point when pressure becomes negative or reaching the lowest temperature available in data, whichever comes first.
+
+Program would also terminate if not converging. Prompting user to try other (usually higher) pressure convergence criterion.
 */
-
 
 int main()
 {
   
   // ************************************************************
-  //! Read in agent property data from files
+  // Read in agent property data from files
   // ************************************************************
+  // Instruction on file requirement in README
   
   // Use property data file "Halon1301_property.csv" for Halon 1301
-  // std::string property_file_name = "Halon1301_property.csv";
+  std::string property_file_name = "Halon1301_property.csv";
   
   // Use property data file "Novec1230_property.csv" for Novec 1230
-  std::string property_file_name = "Novec1230_property.csv";
+  // std::string property_file_name = "Novec1230_property.csv";
         
         
 
   // ****************************************************************************************************
-  //! Set molecular weight ratio and coefficient of dissolved volume expansion according to agent
+  // Set molecular weight ratio and coefficient of volume expansion according to agent
   // ****************************************************************************************************
   
-  double molecular_weight_ratio,      // molecular weight ratio of inert gas vs agent
-         coeff_dissol_expan;          // effect of dissolved inert gas on the liquid volume
+  double molecular_weight_ratio,      // molecular weight ratio of inert gas vs agent (N2/agent). Agent is typically heavier than nitrogen so this value < 1.
+         coeff_dissol_expan;          // effect of dissolved and saturated inert gas on the liquid agent volume expansion.
   
   
   // Halon
-  // molecular_weight_ratio = 0.188;
-  // coeff_dissol_expan = 0.053;
+  molecular_weight_ratio = 0.188;
+  coeff_dissol_expan = 0.053;
   
   // Novec
-  molecular_weight_ratio = 0.088636;
-  coeff_dissol_expan = 0.0429;
+  // molecular_weight_ratio = 0.088636;
+  // coeff_dissol_expan = 0.0429;
+  
+  
+  
+  // ************************************************************
+  // Create an instance of williamson class
+  // ************************************************************
+  // Refer to williamson.hpp for all available class methods
+  
+  williamson test_case(property_file_name, molecular_weight_ratio, coeff_dissol_expan);
+  
+  
+  // Turn on verbose if more information during williamson calculation is desired when running. Helpful when trying to see the pressure convergence process.
+  // test_case.verbose_on();
+  
+  
+  // Set the pressure convergence criterion to a desired value (psi)
+  // For an agent and storage condition the user should test several choices of this criterion and eventually use the smallest value and produces convergent results, or at least use a relatively small value in the range that result is criterion-independent.
+  // This is very important!!! A bad choice of this criterion could easily produce garbage results! Refer to README for more details.
+  // Or maybe change increment size in williamson.cpp (for higher-level user).
+  test_case.set_pressure_threshold(0.05);
+  
+  
         
   
   
   // ************************************************************
-  //! Initial storage conditions
+  // Initial storage conditions
   // ************************************************************
+  // Two agents kept here for easy testing.
+  // Remember to use SI units!
   
   // Halon
-  // double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
-  // double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  // double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
+  double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
+  double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
   
   // Novec
-  double P = 1001 * 6894.76;                    // Partial pressure of nitrogen (Pa)
-  double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  double D = 700;                              // Filling density of storage container (kg/(m^3))
+  // double P = 848.9 * 6894.76;                    // Partial pressure of nitrogen (Pa)
+  // double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  // double D = 1200;                              // Filling density of storage container (kg/(m^3))
 
   
   
   // ************************************************************
-  //! Variables to store tank state and pipe state
+  // Variables to store tank state and pipe state
   // ************************************************************
+  // Both structures defined in williamson.hpp. Copied here again as a note.
   
-  /**
+  /*
   // Structure for the state of tank during discharge.
   struct tank_state
   {
@@ -104,27 +131,10 @@ int main()
   
   
   
-  // ************************************************************
-  //! Create an instance of williamson class
-  //  Refer to williamson.hpp for all available class methods
-  // ************************************************************
-  
-  williamson test_case(property_file_name, molecular_weight_ratio, coeff_dissol_expan);
-  
-  
-  // Turn on verbose for more information is desired when running
-  test_case.verbose_on();
-  
-  
-  // Set pressure threshold to a desired value
-  test_case.set_pressure_threshold(0.3);
-  
-  
-  
   
   
   // ************************************************************
-  //! Solve for tank state
+  // Solve for tank state
   // ************************************************************
 
   int error_code_1 = test_case.tank
@@ -139,20 +149,25 @@ int main()
   // If tank calculation succeeds
   if (error_code_1 == 0)
   {
-    // Print vector to screen
+    
+    // Print vector to screen (can choose units)
     test_case.print_tank_state_en();
     // test_case.print_tank_state_si();
               
     
     // Write to file
+    /*
+    Tank state vector is written into file in such a format that each line is a tank state at a temperature, starting from the storage temperature and ending with the lowest temperature before agent depletion.
+    Each line will have the 8 components of tank state structure in sequence: container temperature, container pressure, discharged liquid mass, liquid mass in container, vapor mass in container, partial pressure of inert gas, density of liquid mixture, and percentage of discharged agent.
+    */
     std::string container_discharge_file;                             // The file to hold container state during discharge
-    // container_discharge_file = "Halon1301_container_discharge.csv";
-    container_discharge_file = "Novec1230_container_discharge.csv";
+    container_discharge_file = "Halon1301_container_discharge.csv";
+    // container_discharge_file = "Novec1230_container_discharge.csv";
     test_case.write_tank_state_en(container_discharge_file);
     // test_case.write_tank_state_si(container_discharge_file);
     
     
-    // Access the tank state vector
+    // Access the tank state vector from the class to local
     // Tank_state = test_case.get_tank_state_en();
     Tank_state = test_case.get_tank_state_si();
     
@@ -163,6 +178,7 @@ int main()
     print_one_tank_state_si(tank_state_snap);
     // tank_state_snap = test_case.get_tank_state_from_T_si(T);
     // print_tank_state_si(tank_state_snap);
+    
   }
   
   else
@@ -175,10 +191,10 @@ int main()
   
   
   // ************************************************************
-  //! Solve for pipe state at a given discharging snapshot
+  // Solve for pipe state at a given discharging snapshot
   // ************************************************************
   
-  // Turn off verbose when not wanting information to overflow
+  // Turn off verbose when not wanting too much information to overflow
   test_case.verbose_off();
   
   
@@ -195,6 +211,7 @@ int main()
   // If pipe calculation succeeds
   if (error_code_2 == 0)
   {
+    
     // Print vector to screen
     test_case.print_pipe_state_en();
     // test_case.print_pipe_state_si();
@@ -202,8 +219,8 @@ int main()
               
     // Write to file
     std::string pipe_expansion_file;                             // The file to hold pipe state during expansion
-    // pipe_expansion_file = "Halon1301_pipe_expansion.csv";
-    pipe_expansion_file = "Novec1230_pipe_expansion.csv";
+    pipe_expansion_file = "Halon1301_pipe_expansion.csv";
+    // pipe_expansion_file = "Novec1230_pipe_expansion.csv";
     test_case.write_pipe_state_en(pipe_expansion_file);
     // test_case.write_pipe_state_si(pipe_expansion_file);
     
@@ -214,11 +231,13 @@ int main()
     
     
     // Access and print the pipe state structure at the given temperature
-    int pipe_line = 6;                        // Access the line number in the pipe state table
+    int pipe_line = 6;                        // The line number to access in the pipe state table
+    // This is just for ease of testing. Can use any temperature (SI) not in pipe state table. Will interpolate.
     pipe_state_snap = test_case.get_pipe_state_en(Pipe_state[pipe_line].temperature);
     print_one_pipe_state_en(pipe_state_snap);
     pipe_state_snap = test_case.get_pipe_state_si(Pipe_state[pipe_line].temperature);
     print_one_pipe_state_si(pipe_state_snap);
+    
   }
   
   else

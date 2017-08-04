@@ -29,10 +29,8 @@ williamson::~williamson()
 
 /**
  * It constructs an agent instance and passes its members to williamson's private members.
- * Tank_state_ and Pipe_state_ are still empty vectors after this.
  * 
- * Users don't need to interact with the agent class.
- * Really the agent class might be unnecessary. The agent constructor can just be implemented here.
+ * Tank_state_ and Pipe_state_ are still empty vectors after this.
  */
 williamson::williamson (std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan)
 {
@@ -69,7 +67,7 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
 // ************************************************************
 
 /**
- * Takes initial storage conditions and calculates container state during discharge, saves in the Tank_state_ vector.
+ * Takes initial storage conditions and calculates container state during discharge. Saves in the Tank_state_ vector.
  * Takes in quantities in SI units, but calculations and results are saved in English units.
  * 
  * No requirement on the temperature increment of the property data file. It only needs to be in temperature-ascending order.
@@ -93,7 +91,7 @@ int williamson::tank (double P, double T, double D)
   // Allow a small error 0.001 to deal with float number comparison issue: slight difference but essentially equal.
   if ((T < (temperature_.back() - 0.001)) || (T > (temperature_.front() + 0.001)))
   {
-    std::cout << "Storage temperature is outside the available temperature data!" << std::endl;
+    std::cout << "Storage temperature is outside the available temperature data! Adapt input." << std::endl;
     return 1;
   }
   
@@ -225,7 +223,8 @@ int williamson::tank (double P, double T, double D)
       // If pressure drops to negative or too many iterations, result is not converging using current combination of threshold and increment.
       if ( (P2 < 0) || (P3 < 0) || (count_iter > 2*P/P_inc) )
       {
-        std::cout << "Tank state is not converging. Try again with a larger threshold, or maybe change increment size." << std::endl;
+        std::cout << "Tank state is not converging. Try again with a larger criterion." << std::endl;
+        std::cout << "This can be done by changing the input of the \"set_pressure_threshold\" member function." << std::endl;
         return 2;
       }
       
@@ -310,7 +309,7 @@ int williamson::pipe (double P, double T)
   // Allow a small error 0.001 to deal with float number comparison issue: slight difference but essentially equal.
   if ((T < (temperature_.back() - 0.001)) || (T > (temperature_.front() + 0.001)))
   {
-    std::cout << "Pipe temperature is outside the available temperature data!" << std::endl;
+    std::cout << "Pipe temperature is outside the available temperature data! Adapt input." << std::endl;
     return 1;
   }
   
@@ -436,7 +435,8 @@ int williamson::pipe (double P, double T)
       // If pressure drops to negative or too many iterations, result is not converging using current combination of threshold and increment.
       if ( (P2 < 0) || (P3 < 0) || (count_iter > 2*P/P_inc) )
       {
-        std::cout << "Pipe state is not converging. Try again with a larger threshold, or maybe change increment size." << std::endl;
+        std::cout << "Pipe state is not converging. Try again with a larger criterion." << std::endl;
+        std::cout << "This can be done by changing the input of the \"set_pressure_threshold\" member function." << std::endl;
         return 2;
       }
       

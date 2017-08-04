@@ -136,8 +136,10 @@ class williamson
         //! Set pressure threshold to the assigned value
         void set_pressure_threshold(double P_thres)         {P_thres_ = P_thres;}
         
-        //! Methods to let the user turn on/off the verbose flag.
+        //! Method to let the user turn on the verbose flag
         void verbose_on()                                   {verbose = true;}
+        
+        //! Method to let the user turn off the verbose flag
         void verbose_off()                                  {verbose = false;}
 
   

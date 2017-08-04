@@ -14,9 +14,8 @@ It contains constructors, destructor and accessors for private members.
 
 The constructor takes as parameters an agent property file name and two float numbers.
 
-The property file should be in such a format that each row starts with a temperature and contains 8 property values at that temperature, separated by commas.
-All rows should be sorted in a temperature-ascending order.
 After reading the property file line by line and inserting into front of vectors, all private member vectors are in a temperature-descending order.
+
 All numbers should be in English units. The 8 properties following temperature (F) are correspondingly: agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), and henry's law constant (psi/weight percent). 
 
 The two inputs after file name are the molecular weight ratio of inert gas vs agent and the coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume.
@@ -36,7 +35,7 @@ class agent
         
         // accessor functions
         std::vector<double> get_temperature() const {return temperature_;}                              //!< access temperature vector (F)
-        std::vector<double> get_vapor_p() const {return vapor_p_;}                                      //!< access agent vapor pressure vector (PSI)
+        std::vector<double> get_vapor_p() const {return vapor_p_;}                                      //!< access agent vapor pressure vector (psi)
         std::vector<double> get_liquid_spec_vol() const {return liquid_spec_vol_;}                      //!< access liquid specific volume vector (cubic foot/pound)
         std::vector<double> get_vapor_spec_vol() const {return vapor_spec_vol_;}                        //!< access vapor specific volume vector (cubic foot/pound)
         std::vector<double> get_liquid_enthal() const {return liquid_enthal_;}                          //!< access liquid enthalpy vector (btu/pound)
@@ -53,7 +52,7 @@ class agent
     
         // agent property parameters
         std::vector<double> temperature_,                                                               //!< temperature (F)
-                            vapor_p_,                                                                   //!< agent vapor pressure (PSI)
+                            vapor_p_,                                                                   //!< agent vapor pressure (psi)
                             liquid_spec_vol_,                                                           //!< liquid specific volume (cubic foot/pound)
                             vapor_spec_vol_,                                                            //!< vapor specific volume (cubic foot/pound)
                             liquid_enthal_,                                                             //!< liquid enthalpy (btu/pound)
