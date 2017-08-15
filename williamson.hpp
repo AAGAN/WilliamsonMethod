@@ -9,7 +9,7 @@ struct tank_state
 {
   double temperature;                   //!< container temperature
   double pressure;                      //!< container pressure
-  double discharge;                     //!< discharged liquid mass
+  double discharge;                     //!< discharged agent mass
   double liquid;                        //!< liquid mass in container
   double vapor;                         //!< vapor mass in container
   double n_pressure;                    //!< partial pressure of inert gas (N2)
@@ -62,6 +62,8 @@ class williamson
         ~williamson();
         
         //! Constructor to initiate agent
+        // Using default values for the specific heat ratio and molecular weight of the inert gas
+        // Agent molecular weight will be given through molecular weight of the inert gas and the molecular weight ratio of inert gas vs agent
         williamson(std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan);
   
         //! Implementation for part one of the Williamson method for the container state during discharge
@@ -70,6 +72,7 @@ class williamson
             double,                       //!< initial partial pressure of nitrogen
             double,                       //!< initial storage temperature
             double                        //!< initial fill density of agent
+            , double gas_specific_heat_ratio = 1.4, double gas_molecular_weight = 28.0134
         );
 
         //! Implementation for part two of the Williamson method for the pipe state with pressure drop
@@ -109,6 +112,12 @@ class williamson
         //! Access the tank state vector in SI units
         std::vector<tank_state> get_tank_state_si() const   {return Tank_state_si_;}
         
+        //! Access the tank ideal gas state vector after liquid depletion in English units
+        std::vector<tank_state> get_tank_ideal_gas_state_en() const   {return Tank_ideal_gas_state_en_;}
+        
+        //! Access the tank ideal gas state vector after liquid depletion in SI units
+        std::vector<tank_state> get_tank_ideal_gas_state_si() const   {return Tank_ideal_gas_state_si_;}
+        
         //! Access the pipe state vector in English units
         std::vector<pipe_state> get_pipe_state_en() const   {return Pipe_state_en_;}
         
@@ -120,6 +129,12 @@ class williamson
         
         //! Access the tank state in SI units at a given temperature (K)
         tank_state get_tank_state_from_T_si(double);
+        
+        //! Access the tank ideal gas state in English units at a given temperature (K)
+        tank_state get_tank_ideal_gas_state_from_T_en(double);
+        
+        //! Access the tank ideal gas state in SI units at a given temperature (K)
+        tank_state get_tank_ideal_gas_state_from_T_si(double);
         
         //! Access the tank state in English units at a given percentage of discharge
         tank_state get_tank_state_from_percentdischarge_en(double);
@@ -148,7 +163,9 @@ class williamson
         bool verbose;                                           // A boolean flag. Default false. Turn on to print running details and messages.
     
         std::vector<tank_state> Tank_state_en_,                 // The vector that holds tank state at all temperatures, in English units
-                                Tank_state_si_;                 // in SI units
+                                Tank_state_si_,                 // in SI units
+                                Tank_ideal_gas_state_en_,       // The vector that holds tank state after liquid depletion and only left with ideal gas expansion, in English units
+                                Tank_ideal_gas_state_si_;       // in SI units
         std::vector<pipe_state> Pipe_state_en_,                 // The vector that holds pipe state at all temperatures, in English units
                                 Pipe_state_si_;                 // in SI units
         
@@ -160,12 +177,16 @@ class williamson
                             vapor_enthal_,                      // vapor enthalpy (btu/pound)
                             liquid_entro_,                      // liquid entropy (btu/pound/rankine)
                             vapor_entro_,                       // vapor entropy (btu/pound/rankine)
-                            c_henry_;                           // henry's law constant (psi/weight percent)
+                            c_henry_,                           // henry's law constant (psi/weight percent)
+                            specific_heat_ratio_;               // agent specific heat ratio (Cp/Cv)
         
         double              molecular_weight_ratio_,            // molecular weight ratio of inert gas vs agent
                             coeff_dissol_expan_;                // coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume
                             
         double              P_thres_;                           // pressure convergence threshold (psi)
+        
+        // double              gas_specific_heat_ratio;            // Specific heat ratio of the inert gas
+        // double              gas_molecular_weight;               // Molecular weight of the inert gas
   
 };
 

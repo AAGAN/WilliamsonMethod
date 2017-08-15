@@ -86,12 +86,14 @@ agent::agent(std::string property_file_name, double molecular_weight_ratio, doub
         vapor_entro_.insert(vapor_entro_.begin(), atof(one_number.c_str()));
         getline(num_list, one_number, ',');
         c_henry_.insert(c_henry_.begin(), atof(one_number.c_str()));
+        getline(num_list, one_number, ',');
+        specific_heat_ratio_.insert(specific_heat_ratio_.begin(), atof(one_number.c_str()));
         
         // The linear relation between Henry's constant and temperature for Novec is already appended in its data file.
         // c_henry_.insert(c_henry_.begin(), 0.9286*temperature_.front() + 3494.6);
         // c_henry_.insert(c_henry_.begin(), 3600);
         
-        // Expect 9 numbers from each line
+        // Expect 10 numbers from each line
         if (!num_list.eof())
         {
             std::cout << "Unexpected: didn't reach end of line!" << std::endl;
