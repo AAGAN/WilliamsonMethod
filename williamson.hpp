@@ -69,10 +69,11 @@ class williamson
         //! Implementation for part one of the Williamson method for the container state during discharge
         int tank
         (
-            double,                       //!< initial partial pressure of nitrogen
-            double,                       //!< initial storage temperature
-            double                        //!< initial fill density of agent
-            , double gas_specific_heat_ratio = 1.4, double gas_molecular_weight = 28.0134
+            double,                       				//!< initial partial pressure of nitrogen
+            double,                       				//!< initial storage temperature
+            double,                        				//!< initial fill density of agent
+            double gas_specific_heat_ratio = 1.4,		//!< specific heat ratio of inert gas
+			double gas_molecular_weight = 28.0134		//!< molecular weight of inert gas
         );
 
         //! Implementation for part two of the Williamson method for the pipe state with pressure drop
