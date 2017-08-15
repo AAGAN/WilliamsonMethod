@@ -103,7 +103,7 @@ int main()
   {
     double temperature;         //!< container temperature
     double pressure;            //!< container pressure
-    double discharge;           //!< discharged liquid mass
+    double discharge;           //!< discharged agent mass
     double liquid;              //!< liquid mass in container
     double vapor;               //!< vapor mass in container
     double n_pressure;          //!< partial pressure of inert gas (N2)
@@ -125,7 +125,7 @@ int main()
 
   // State containers, for test here.
   std::vector<tank_state> Tank_state;
-  tank_state tank_state_snap;
+  tank_state tank_state_snap, tank_ideal_gas_state_snap;
   std::vector<pipe_state> Pipe_state;
   pipe_state pipe_state_snap;
   
@@ -178,6 +178,15 @@ int main()
     print_one_tank_state_si(tank_state_snap);
     // tank_state_snap = test_case.get_tank_state_from_T_si(T);
     // print_tank_state_si(tank_state_snap);
+    
+    
+    // Ideal gas tank state accessor
+    Tank_state = test_case.get_tank_ideal_gas_state_en();     // Access the ideal gas tank state vector
+    print_one_tank_state_en(Tank_state[1]);                   // Print one ideal gas state to check
+    
+    // Access and print the ideal gas tank state at a temperature (K)
+    tank_ideal_gas_state_snap = test_case.get_tank_ideal_gas_state_from_T_en(272.0);
+    print_one_tank_state_en(tank_ideal_gas_state_snap);
     
   }
   

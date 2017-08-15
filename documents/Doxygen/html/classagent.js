@@ -9,6 +9,7 @@ var classagent =
     [ "get_liquid_entro", "classagent.html#a368b3a1749abf5d4c5fb1179af4fa0c2", null ],
     [ "get_liquid_spec_vol", "classagent.html#a3f6d634d923d522df8a6a7be9c7e46d3", null ],
     [ "get_molecular_weight_ratio", "classagent.html#a71d506940f792e2d8b73978bc8c688e5", null ],
+    [ "get_specific_heat_ratio", "classagent.html#a03e98c8c71bd2b90b6fd916ebf4cd081", null ],
     [ "get_temperature", "classagent.html#a97e4591f9605061a296454cf989fa1c6", null ],
     [ "get_vapor_enthal", "classagent.html#abe7517530d177b4248c4983e3b6bfa99", null ],
     [ "get_vapor_entro", "classagent.html#a1a39e272e8ef8639e438361b69f42a39", null ],

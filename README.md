@@ -73,11 +73,11 @@ Each agent is read in from its specific file, which has to obey the following fo
 
 * All quantities in the file are in English units.
 
-* Each row has 9 numbers as quantities at a temperature. In sequence and separated by commas they are: temperature (F), agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), henry's law constant (psi/weight percent).
+* Each row has 9 numbers as quantities at a temperature. In sequence and separated by commas they are: temperature (F), agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), henry's law constant (psi/weight percent), heat capacity ratio (Cp/Cv).
 
 * Agent property file needs to be prepared with data in a temperature-ascending order for the rows, starting from the lowest temperature and ending with the highest temperature data available. There is no requirement on the temperature increment between lines. (Not necessarily integer temperature or incrementing 1 degree each line.)
 
-* It must finish with the line for the highest temperature and cannot start with a new line at the end.
+* It must finish with the line for the highest temperature and cannot start with a new line at the end!!! This is very important and can be a common source of error.
 
 
 
@@ -86,6 +86,10 @@ After being read into williamson class, each physical property is a private vect
 The current data file used for Halon-1301 is from Williamson paper and that for Novec-1230 is from Tom.
 For Halon the Williamson paper has its Henry's constant data, but for Novec Tom assumes Henry's constant is linear with temperature in VB code, and we are currently using the same expression ( C_henry = 0.9286*T(F) + 3494.6 ).
 Verification cases simply using constant values (3400 and 3600) for Henry's Law constant show that it's not affecting the pressure recession table, so we can reasonably worry less about it.
+
+In order to calculate ideal gas expansion in tank after liquid is depleted, specific heat ratio data is needed for agent.
+Currently using a constant specific heat ratio at 25C and 1 bar for both Halon and Novec. Added in the agent property file after Henry's Law constant.
+For Nitrogen the specific heat ratio is 7/5.
 
 
 

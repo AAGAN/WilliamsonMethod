@@ -48,6 +48,8 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
   liquid_entro_ = extinguishing_agent.get_liquid_entro();
   vapor_entro_ = extinguishing_agent.get_vapor_entro();
   c_henry_ = extinguishing_agent.get_c_henry();
+  specific_heat_ratio_ = extinguishing_agent.get_specific_heat_ratio();
+  
   molecular_weight_ratio_ = extinguishing_agent.get_molecular_weight_ratio();
   coeff_dissol_expan_ = extinguishing_agent.get_coeff_dissol_expan();
   
@@ -75,7 +77,7 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
  * Use the properties if storage temperature exists in file, otherwise linearly interpolate between two closest temperature data.
  * Aborts if storage temperature is outside available range. No extrapolation.
  */
-int williamson::tank (double P, double T, double D)
+int williamson::tank (double P, double T, double D, double gas_specific_heat_ratio, double gas_molecular_weight)
 {
   
   // Convert storage conditions from SI units to English units
@@ -261,22 +263,116 @@ int williamson::tank (double P, double T, double D)
       print_one_tank_state_en(current_state);
     }
     
-    // Make sure there is still liquid agent in container
-    if (L2 >= 0.0)                                // Still liquid left. Save the current state.
+    
+    // Check whether there is still liquid agent in container
+    if (L2 >= 0.0)                                    // Still liquid left. Save the current state.
     {
-      Tank_state_en_.push_back(current_state);        // saved still in English units
+      Tank_state_en_.push_back(current_state);        // save in English units
       Tank_state_si_.push_back(current_state_si);     // save in si units
     }
-    else
+    
+    else                                              // Interpolate linearly between the two states before and after liquid depletion to find the exact depletion point.
     {
-      std::cout << std::endl << "Liquid agent depleted at temperature " << current_state.temperature << "(F)" << std::endl << std::endl;
+      // Update current state to the exact depletion point, in English units
+      double linear_coeff = (0.0 - current_state.liquid) / (Tank_state_en_.back().liquid - current_state.liquid);      // coefficient for linear interpolation
+      current_state.temperature = (linear_coeff * (Tank_state_en_.back().temperature - current_state.temperature)) + current_state.temperature;
+      current_state.pressure = (linear_coeff * (Tank_state_en_.back().pressure - current_state.pressure)) + current_state.pressure;
+      current_state.discharge = (linear_coeff * (Tank_state_en_.back().discharge - current_state.discharge)) + current_state.discharge;
+      current_state.liquid = 0.0;
+      current_state.vapor = (linear_coeff * (Tank_state_en_.back().vapor - current_state.vapor)) + current_state.vapor;
+      current_state.n_pressure = (linear_coeff * (Tank_state_en_.back().n_pressure - current_state.n_pressure)) + current_state.n_pressure;
+      current_state.liquid_density = (linear_coeff * (Tank_state_en_.back().liquid_density - current_state.liquid_density)) + current_state.liquid_density;
+      current_state.percent_discharge = (linear_coeff * (Tank_state_en_.back().percent_discharge - current_state.percent_discharge)) + current_state.percent_discharge;
+        
+      // Update current container state in SI units
+      current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;     // F to K
+      current_state_si.pressure = current_state.pressure * 6894.76;                         // psi to Pa
+      current_state_si.discharge = current_state.discharge * 0.453592;                      // lb to kg
+      current_state_si.liquid = current_state.liquid * 0.453592;                            // lb to kg
+      current_state_si.vapor = current_state.vapor * 0.453592;                              // lb to kg
+      current_state_si.n_pressure = current_state.n_pressure * 6894.76;                     // psi to Pa
+      current_state_si.liquid_density = current_state.liquid_density * 16.0185;             // lb/(ft^3) to kg/(m^3)
+      current_state_si.percent_discharge = current_state.percent_discharge;                 // no need to convert for percentage
+      
+      // Save the interpolated depletion point
+      Tank_state_en_.push_back(current_state);        // save in English units
+      Tank_state_si_.push_back(current_state_si);     // save in si units
+      
+      std::cout << std::endl << "Liquid agent depletes at temperature " << current_state.temperature << "(F)" << std::endl << std::endl;
+      
+      
+      
+      // ************************************************************
+      // After this point the container is left with gas mixture of N2 and agent, which obeys Ideal Gas Law.
+      // ************************************************************
+      
+      // Save the exact depletion state as the initial ideal gas state
+      Tank_ideal_gas_state_en_.push_back(current_state);        // save in English units
+      Tank_ideal_gas_state_si_.push_back(current_state_si);     // save in si units
+      
+      int count_ideal_gas_T = count_T;                          // count temperature step in temperature_ list during ideal gas calculation
+      double pressure_inert_gas_0,                              // partial pressure of inert gas inside tank before expansion in current step
+             pressure_inert_gas_t,                              // partial pressure of inert gas inside tank after expansion in current step
+             pressure_agent_0,                                  // partial pressure of agent vapor inside tank before expansion in current step
+             pressure_agent_t,                                  // partial pressure of agent vapor inside tank after expansion in current step
+             weight_inert_gas_t,                                // weight of inert gas inside tank after expansion in current step
+             weight_agent_0,                                    // weight of agent vapor inside tank before expansion in current step
+             weight_agent_t;                                    // weight of agent vapor inside tank after expansion in current step
+      double R = 10.73;                                         // gas constant (psi*ft3/(lbmol*R)). Remember to change temperature from F to R when using this value!
+      
+      // Loop through the rest of temperatures in file for ideal gas calculation
+      /*
+        For each step inside loop, current_state represents the state before expansion, and count_ideal_gas_T points to the state after expansion to be calculated.
+      */
+      for ( ; count_ideal_gas_T < temperature_.size(); count_ideal_gas_T++)
+      {
+        // initialize states before current step expansion
+        pressure_inert_gas_0 = current_state.n_pressure;
+        pressure_agent_0 = current_state.pressure - current_state.n_pressure;
+        weight_agent_0 = ( (pressure_agent_0*1) / (R * (459.67+current_state.temperature)) ) * (gas_molecular_weight/molecular_weight_ratio_);     // calculate agent vapor mole, then transfer to mass in g, then into lbs
+        
+        
+        // Calculating ideal gas states after expansion
+        pressure_inert_gas_t = pressure_inert_gas_0 * pow( (temperature_[count_ideal_gas_T] / current_state.temperature), (gas_specific_heat_ratio/(gas_specific_heat_ratio-1)) );
+        current_state.n_pressure = pressure_inert_gas_t;
+        pressure_agent_t = pressure_agent_0 * pow( (temperature_[count_ideal_gas_T] / current_state.temperature), (specific_heat_ratio_[count_ideal_gas_T]/(specific_heat_ratio_[count_ideal_gas_T]-1)) ); // use the specific heat ratio at the end of current step, just for ease.
+        current_state.pressure = pressure_agent_t + pressure_inert_gas_t;
+        
+        current_state.temperature = temperature_[count_ideal_gas_T];
+        current_state.liquid = 0.0;
+        current_state.liquid_density = 0.0;
+        
+        weight_inert_gas_t = ( (pressure_inert_gas_t*1) / (R * (459.67+current_state.temperature)) ) * gas_molecular_weight;                       // calculate inert gas mole, then transfer to mass in g, then into lbs
+        weight_agent_t = ( (pressure_agent_t*1) / (R * (459.67+current_state.temperature)) ) * (gas_molecular_weight/molecular_weight_ratio_);     // calculate agent vapor mole, then transfer to mass in g, then into lbs
+        current_state.vapor = weight_agent_t;
+        current_state.discharge = current_state.discharge + (weight_agent_0 - weight_agent_t);
+        current_state.percent_discharge = current_state.discharge / D;
+        
+        
+        // Update current container state in SI units
+        current_state_si.temperature = (current_state.temperature - 32)/(9/5.0) + 273.15;     // F to K
+        current_state_si.pressure = current_state.pressure * 6894.76;                         // psi to Pa
+        current_state_si.discharge = current_state.discharge * 0.453592;                      // lb to kg
+        current_state_si.liquid = current_state.liquid * 0.453592;                            // lb to kg
+        current_state_si.vapor = current_state.vapor * 0.453592;                              // lb to kg
+        current_state_si.n_pressure = current_state.n_pressure * 6894.76;                     // psi to Pa
+        current_state_si.liquid_density = current_state.liquid_density * 16.0185;             // lb/(ft^3) to kg/(m^3)
+        current_state_si.percent_discharge = current_state.percent_discharge;                 // no need to convert for percentage
+      
+        // Save the current ideal gas state
+        Tank_ideal_gas_state_en_.push_back(current_state);        // save in English units
+        Tank_ideal_gas_state_si_.push_back(current_state_si);     // save in si units
+      }
+      
+      
+      std::cout << std::endl << "All temperatures in property file reached in tank state calculation with ideal gas after liquid depletes." << std::endl << std::endl;
       return 0;
     }
     
   }
 
 
-  std::cout << std::endl << "All temperatures in property file reached in tank state calculation." << std::endl << std::endl;
+  std::cout << std::endl << "All temperatures in property file reached in tank state calculation before liquid depletes." << std::endl << std::endl;
   return 0;
   
 }
@@ -871,6 +967,128 @@ tank_state williamson::get_tank_state_from_T_si(double T)
         quote_state.n_pressure = (linear_coeff * (Tank_state_si_[i].n_pressure - Tank_state_si_[i+1].n_pressure)) + Tank_state_si_[i+1].n_pressure;
         quote_state.liquid_density = (linear_coeff * (Tank_state_si_[i].liquid_density - Tank_state_si_[i+1].liquid_density)) + Tank_state_si_[i+1].liquid_density;
         quote_state.percent_discharge = (linear_coeff * (Tank_state_si_[i].percent_discharge - Tank_state_si_[i+1].percent_discharge)) + Tank_state_si_[i+1].percent_discharge;
+        break;
+      }
+    }
+  }
+  
+  return quote_state;
+  
+}
+
+
+
+
+
+/**
+ * Interpolate at the given temperature according to tank ideal gas state table after liquid depletion (English units).
+ * Temperature input in SI units (K).
+ */
+tank_state williamson::get_tank_ideal_gas_state_from_T_en(double T)
+{
+  
+  T = (T - 273.15)*(9/5.0) + 32;                            // convert from kelvin to fahrenheit
+  
+  // If the quote temperature is outside the tank state temperature range, abort the program.
+  if ((T < (Tank_ideal_gas_state_en_.back().temperature - 0.001)) || (T > (Tank_ideal_gas_state_en_.front().temperature + 0.001)))
+  {
+    std::cout << "Quote temperature is outside the available temperature data!" << std::endl;
+    abort();
+  }
+  
+  
+  // The temperature is inside range
+  tank_state quote_state;
+  
+  // Use the lowest temperature tank state
+  if ( std::abs(T - Tank_ideal_gas_state_en_.back().temperature) <= 0.001 )
+  {
+    quote_state = Tank_ideal_gas_state_en_.back();
+  }
+  
+  // Use the highest temperature tank state
+  else if ( std::abs(T - Tank_ideal_gas_state_en_.front().temperature) <= 0.001 )
+  {
+    quote_state = Tank_ideal_gas_state_en_.front();
+  }
+  
+  // Find the block that the quote temperature belongs to and interpolate linearly
+  // It's fine to interpolate even if temperature is close to bounds
+  else
+  {
+    for (int i = 0; i < (Tank_ideal_gas_state_en_.size()-1); i++)     // loop through all blocks
+    {
+      if ((T <= Tank_ideal_gas_state_en_[i].temperature) && (T >= Tank_ideal_gas_state_en_[i+1].temperature))
+      {
+        double linear_coeff = (T - Tank_ideal_gas_state_en_[i+1].temperature) / (Tank_ideal_gas_state_en_[i].temperature - Tank_ideal_gas_state_en_[i+1].temperature);      // coefficient for linear interpolation
+        quote_state.temperature = T;
+        quote_state.pressure = (linear_coeff * (Tank_ideal_gas_state_en_[i].pressure - Tank_ideal_gas_state_en_[i+1].pressure)) + Tank_ideal_gas_state_en_[i+1].pressure;
+        quote_state.discharge = (linear_coeff * (Tank_ideal_gas_state_en_[i].discharge - Tank_ideal_gas_state_en_[i+1].discharge)) + Tank_ideal_gas_state_en_[i+1].discharge;
+        quote_state.liquid = (linear_coeff * (Tank_ideal_gas_state_en_[i].liquid - Tank_ideal_gas_state_en_[i+1].liquid)) + Tank_ideal_gas_state_en_[i+1].liquid;
+        quote_state.vapor = (linear_coeff * (Tank_ideal_gas_state_en_[i].vapor - Tank_ideal_gas_state_en_[i+1].vapor)) + Tank_ideal_gas_state_en_[i+1].vapor;
+        quote_state.n_pressure = (linear_coeff * (Tank_ideal_gas_state_en_[i].n_pressure - Tank_ideal_gas_state_en_[i+1].n_pressure)) + Tank_ideal_gas_state_en_[i+1].n_pressure;
+        quote_state.liquid_density = (linear_coeff * (Tank_ideal_gas_state_en_[i].liquid_density - Tank_ideal_gas_state_en_[i+1].liquid_density)) + Tank_ideal_gas_state_en_[i+1].liquid_density;
+        quote_state.percent_discharge = (linear_coeff * (Tank_ideal_gas_state_en_[i].percent_discharge - Tank_ideal_gas_state_en_[i+1].percent_discharge)) + Tank_ideal_gas_state_en_[i+1].percent_discharge;
+        break;
+      }
+    }
+  }
+  
+  return quote_state;
+  
+}
+
+
+
+
+
+/**
+ * Interpolate at the given temperature according to tank state discharge table (SI units).
+ * Temperature input in SI units (K).
+ */
+tank_state williamson::get_tank_ideal_gas_state_from_T_si(double T)
+{
+  
+  // If the quote temperature is outside the tank state temperature range, abort the program.
+  if ((T < (Tank_ideal_gas_state_si_.back().temperature - 0.001)) || (T > (Tank_ideal_gas_state_si_.front().temperature + 0.001)))
+  {
+    std::cout << "Quote temperature is outside the available temperature data!" << std::endl;
+    abort();
+  }
+  
+  
+  // The temperature is inside range
+  tank_state quote_state;
+  
+  // Use the lowest temperature tank state
+  if ( std::abs(T - Tank_ideal_gas_state_si_.back().temperature) <= 0.001 )
+  {
+    quote_state = Tank_ideal_gas_state_si_.back();
+  }
+  
+  // Use the highest temperature tank state
+  else if ( std::abs(T - Tank_ideal_gas_state_si_.front().temperature) <= 0.001 )
+  {
+    quote_state = Tank_ideal_gas_state_si_.front();
+  }
+  
+  // Find the block that the quote temperature belongs to and interpolate linearly
+  // It's fine to interpolate even if temperature is close to bounds
+  else
+  {
+    for (int i = 0; i < (Tank_ideal_gas_state_si_.size()-1); i++)     // loop through all blocks
+    {
+      if ((T <= Tank_ideal_gas_state_si_[i].temperature) && (T >= Tank_ideal_gas_state_si_[i+1].temperature))
+      {
+        double linear_coeff = (T - Tank_ideal_gas_state_si_[i+1].temperature) / (Tank_ideal_gas_state_si_[i].temperature - Tank_ideal_gas_state_si_[i+1].temperature);      // coefficient for linear interpolation
+        quote_state.temperature = T;
+        quote_state.pressure = (linear_coeff * (Tank_ideal_gas_state_si_[i].pressure - Tank_ideal_gas_state_si_[i+1].pressure)) + Tank_ideal_gas_state_si_[i+1].pressure;
+        quote_state.discharge = (linear_coeff * (Tank_ideal_gas_state_si_[i].discharge - Tank_ideal_gas_state_si_[i+1].discharge)) + Tank_ideal_gas_state_si_[i+1].discharge;
+        quote_state.liquid = (linear_coeff * (Tank_ideal_gas_state_si_[i].liquid - Tank_ideal_gas_state_si_[i+1].liquid)) + Tank_ideal_gas_state_si_[i+1].liquid;
+        quote_state.vapor = (linear_coeff * (Tank_ideal_gas_state_si_[i].vapor - Tank_ideal_gas_state_si_[i+1].vapor)) + Tank_ideal_gas_state_si_[i+1].vapor;
+        quote_state.n_pressure = (linear_coeff * (Tank_ideal_gas_state_si_[i].n_pressure - Tank_ideal_gas_state_si_[i+1].n_pressure)) + Tank_ideal_gas_state_si_[i+1].n_pressure;
+        quote_state.liquid_density = (linear_coeff * (Tank_ideal_gas_state_si_[i].liquid_density - Tank_ideal_gas_state_si_[i+1].liquid_density)) + Tank_ideal_gas_state_si_[i+1].liquid_density;
+        quote_state.percent_discharge = (linear_coeff * (Tank_ideal_gas_state_si_[i].percent_discharge - Tank_ideal_gas_state_si_[i+1].percent_discharge)) + Tank_ideal_gas_state_si_[i+1].percent_discharge;
         break;
       }
     }

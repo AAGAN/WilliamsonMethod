@@ -16,7 +16,7 @@ The constructor takes as parameters an agent property file name and two float nu
 
 After reading the property file line by line and inserting into front of vectors, all private member vectors are in a temperature-descending order.
 
-All numbers should be in English units. The 8 properties following temperature (F) are correspondingly: agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), and henry's law constant (psi/weight percent). 
+All numbers should be in English units. The 9 properties following temperature (F) are correspondingly: agent vapor pressure (PSI), liquid specific volume (cubic foot/pound), vapor specific volume (cubic foot/pound), liquid enthalpy (btu/pound), vapor enthalpy (btu/pound), liquid entropy (btu/pound/rankine), vapor entropy (btu/pound/rankine), henry's law constant (psi/weight percent), and specific heat ratio (Cp/Cv).
 
 The two inputs after file name are the molecular weight ratio of inert gas vs agent and the coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume.
 */
@@ -43,6 +43,7 @@ class agent
         std::vector<double> get_liquid_entro() const {return liquid_entro_;}                            //!< access liquid entropy vector (btu/pound/rankine)
         std::vector<double> get_vapor_entro() const {return vapor_entro_;}                              //!< access vapor entropy vector (btu/pound/rankine)
         std::vector<double> get_c_henry() const {return c_henry_;}                                      //!< access henry's law constant vector (psi/weight percent)
+        std::vector<double> get_specific_heat_ratio() const {return specific_heat_ratio_;}              //!< access specific_heat_ratio (Cp/Cv)
         
         double              get_molecular_weight_ratio() const {return molecular_weight_ratio_;}        //!< access molecular weight ratio of inert gas vs agent
         double              get_coeff_dissol_expan() const {return coeff_dissol_expan_;}                //!< access coefficient of liquid volume expansion
@@ -59,7 +60,8 @@ class agent
                             vapor_enthal_,                                                              //!< vapor enthalpy (btu/pound)
                             liquid_entro_,                                                              //!< liquid entropy (btu/pound/rankine)
                             vapor_entro_,                                                               //!< vapor entropy (btu/pound/rankine)
-                            c_henry_;                                                                   //!< henry's law constant (psi/weight percent)
+                            c_henry_,                                                                   //!< henry's law constant (psi/weight percent)
+                            specific_heat_ratio_;                                                       //!< agent specific heat ratio (Cp/Cv)
         
         double              molecular_weight_ratio_,                                                    //!< molecular weight ratio of inert gas vs agent
                             coeff_dissol_expan_;                                                        //!< coefficient for the expansion effect of dissolved and saturated inert gas on the liquid volume
