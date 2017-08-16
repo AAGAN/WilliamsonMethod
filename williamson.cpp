@@ -32,7 +32,7 @@ williamson::~williamson()
  * 
  * Tank_state_ and Pipe_state_ are still empty vectors after this.
  */
-williamson::williamson (std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan)
+williamson::williamson (std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan, double gas_specific_heat_ratio_, double gas_molecular_weight_)
 {
   
   // Construct an agent instance
@@ -53,6 +53,8 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
   molecular_weight_ratio_ = extinguishing_agent.get_molecular_weight_ratio();
   coeff_dissol_expan_ = extinguishing_agent.get_coeff_dissol_expan();
   
+  gas_specific_heat_ratio = gas_specific_heat_ratio_;
+  gas_molecular_weight = gas_molecular_weight_;
   
   P_thres_ = 0.5;         // default pressure convergence threshold (psi)
   
@@ -77,7 +79,7 @@ williamson::williamson (std::string property_file_name, double molecular_weight_
  * Use the properties if storage temperature exists in file, otherwise linearly interpolate between two closest temperature data.
  * Aborts if storage temperature is outside available range. No extrapolation.
  */
-int williamson::tank (double P, double T, double D, double gas_specific_heat_ratio, double gas_molecular_weight)
+int williamson::tank (double P, double T, double D)//, double gas_specific_heat_ratio, double gas_molecular_weight)
 {
   
   // Convert storage conditions from SI units to English units

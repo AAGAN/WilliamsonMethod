@@ -64,16 +64,21 @@ class williamson
         //! Constructor to initiate agent
         // Using default values for the specific heat ratio and molecular weight of the inert gas
         // Agent molecular weight will be given through molecular weight of the inert gas and the molecular weight ratio of inert gas vs agent
-        williamson(std::string property_file_name, double molecular_weight_ratio, double coeff_dissol_expan);
+        williamson
+        (
+            std::string property_file_name, 
+            double molecular_weight_ratio, 
+            double coeff_dissol_expan, 
+            double gas_specific_heat_ratio_ = 1.4,
+            double gas_molecular_weight_ = 28.0134
+        ); //last two values are only for nitrogen
   
         //! Implementation for part one of the Williamson method for the container state during discharge
         int tank
         (
             double,                       				//!< initial partial pressure of nitrogen
             double,                       				//!< initial storage temperature
-            double,                        				//!< initial fill density of agent
-            double gas_specific_heat_ratio = 1.4,		//!< specific heat ratio of inert gas
-			double gas_molecular_weight = 28.0134		//!< molecular weight of inert gas
+            double                        				//!< initial fill density of agent
         );
 
         //! Implementation for part two of the Williamson method for the pipe state with pressure drop
@@ -186,8 +191,8 @@ class williamson
                             
         double              P_thres_;                           // pressure convergence threshold (psi)
         
-        // double              gas_specific_heat_ratio;            // Specific heat ratio of the inert gas
-        // double              gas_molecular_weight;               // Molecular weight of the inert gas
+        double              gas_specific_heat_ratio;            // Specific heat ratio of the inert gas
+        double              gas_molecular_weight;               // Molecular weight of the inert gas
   
 };
 
