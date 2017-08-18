@@ -27,10 +27,10 @@ int main()
   // Instruction on file requirement in README
   
   // Use property data file "Halon1301_property.csv" for Halon 1301
-  std::string property_file_name = "Halon1301_property.csv";
+  //std::string property_file_name = "Halon1301_property.csv";
   
   // Use property data file "Novec1230_property.csv" for Novec 1230
-  // std::string property_file_name = "Novec1230_property.csv";
+   std::string property_file_name = "Novec1230_property.csv";
         
         
 
@@ -43,12 +43,12 @@ int main()
   
   
   // Halon
-  molecular_weight_ratio = 0.188;
-  coeff_dissol_expan = 0.053;
+  //molecular_weight_ratio = 0.188;
+  //coeff_dissol_expan = 0.053;
   
   // Novec
-  // molecular_weight_ratio = 0.088636;
-  // coeff_dissol_expan = 0.0429;
+   molecular_weight_ratio = 0.088636;
+   coeff_dissol_expan = 0.0429;
   
   
   
@@ -68,7 +68,7 @@ int main()
   // For an agent and storage condition the user should test several choices of this criterion and eventually use the smallest value and produces convergent results, or at least use a relatively small value in the range that result is criterion-independent.
   // This is very important!!! A bad choice of this criterion could easily produce garbage results! Refer to README for more details.
   // Or maybe change increment size in williamson.cpp (for higher-level user).
-  test_case.set_pressure_threshold(0.05);
+  test_case.set_pressure_threshold(0.01);
   
   
         
@@ -81,14 +81,14 @@ int main()
   // Remember to use SI units!
   
   // Halon
-  double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
-  double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
+  //double P = 401 * 6894.76;                       // Partial pressure of nitrogen (Pa)
+  //double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+  //double D = 70 * 16.0185;                        // Filling density of storage container (kg/(m^3))
   
   // Novec
-  // double P = 848.9 * 6894.76;                    // Partial pressure of nitrogen (Pa)
-  // double T = (68 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
-  // double D = 1200;                              // Filling density of storage container (kg/(m^3))
+   double P = 7000000; //848.9 * 6894.76;                    // Partial pressure of nitrogen (Pa)
+   double T = (70 - 32)/(9/5.0) + 273.15;          // Storage temperature (Kelvin)
+   double D = 1400;                              // Filling density of storage container (kg/(m^3))
 
   
   
@@ -125,7 +125,7 @@ int main()
 
   // State containers, for test here.
   std::vector<tank_state> Tank_state;
-  tank_state tank_state_snap, tank_ideal_gas_state_snap;
+  tank_state tank_state_snap_si, tank_ideal_gas_state_snap;
   std::vector<pipe_state> Pipe_state;
   pipe_state pipe_state_snap;
   
@@ -161,21 +161,23 @@ int main()
     Each line will have the 8 components of tank state structure in sequence: container temperature, container pressure, discharged liquid mass, liquid mass in container, vapor mass in container, partial pressure of inert gas, density of liquid mixture, and percentage of discharged agent.
     */
     std::string container_discharge_file;                             // The file to hold container state during discharge
-    container_discharge_file = "Halon1301_container_discharge.csv";
-    // container_discharge_file = "Novec1230_container_discharge.csv";
+    //container_discharge_file = "Halon1301_container_discharge.csv";
+     container_discharge_file = "Novec1230_container_discharge.csv";
     test_case.write_tank_state_en(container_discharge_file);
     // test_case.write_tank_state_si(container_discharge_file);
     
     
     // Access the tank state vector from the class to local
-    // Tank_state = test_case.get_tank_state_en();
-    Tank_state = test_case.get_tank_state_si();
+     Tank_state = test_case.get_tank_state_en();
+    //Tank_state = test_case.get_tank_state_si();
     
     
     // Access and print the tank state structure at the given temperature or percentage of discharge
-    // tank_state_snap = test_case.get_tank_state_from_T_en(T);
-    tank_state_snap = test_case.get_tank_state_from_percentdischarge_si(0.5);
-    print_one_tank_state_si(tank_state_snap);
+    //tank_state_snap = test_case.get_tank_state_from_T_en(T);
+    tank_state_snap_si = test_case.get_tank_state_from_percentdischarge_si(0.5);
+    //tank_state_snap = test_case.get_tank_state_from_percentdischarge_en(0.5);
+    print_one_tank_state_si(tank_state_snap_si);
+    //print_one_tank_state_en(tank_state_snap);
     // tank_state_snap = test_case.get_tank_state_from_T_si(T);
     // print_tank_state_si(tank_state_snap);
     
@@ -210,8 +212,8 @@ int main()
   // int tank_line = 16;                        // Choose the line number in the tank state table as the starting pipe condition. Use for testing.
   int error_code_2 = test_case.pipe
   (
-    tank_state_snap.n_pressure,
-    tank_state_snap.temperature
+    tank_state_snap_si.n_pressure,
+    tank_state_snap_si.temperature
     // Tank_state[tank_line].n_pressure, 
     // Tank_state[tank_line].temperature
   );
@@ -228,8 +230,8 @@ int main()
               
     // Write to file
     std::string pipe_expansion_file;                             // The file to hold pipe state during expansion
-    pipe_expansion_file = "Halon1301_pipe_expansion.csv";
-    // pipe_expansion_file = "Novec1230_pipe_expansion.csv";
+    //pipe_expansion_file = "Halon1301_pipe_expansion.csv";
+     pipe_expansion_file = "Novec1230_pipe_expansion.csv";
     test_case.write_pipe_state_en(pipe_expansion_file);
     // test_case.write_pipe_state_si(pipe_expansion_file);
     
